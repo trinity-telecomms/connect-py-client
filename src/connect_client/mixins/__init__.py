@@ -27,10 +27,7 @@ class ResourceMixin:
         default headers do not include the Authorization header which is required
         for most endpoints. Use _get_auth_headers() instead.
         """
-        return {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
+        return {"Content-Type": "application/json", "Accept": "application/json"}
 
     def _get_token_from_cache(self):
         """
@@ -73,4 +70,4 @@ class ResourceMixin:
             response = requests.get(url, headers=request_headers)
             return response.status_code, response.json()
         except Exception:
-            raise ConnectAPIError('Failed to make request to Connect API')
+            raise ConnectAPIError("Failed to make request to Connect API")

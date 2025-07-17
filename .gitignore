@@ -11,3 +11,6 @@ wheels/
 
 # IDE Specifics
 .idea/
+
+# Tests
+_test_client.py

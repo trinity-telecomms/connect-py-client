@@ -17,4 +17,4 @@ class OrgsAPI(ResourceMixin):
             return response
         except Exception as e:
             print(e)
-            raise ConnectAPIError('Failed to get company from Connect API')
+            raise ConnectAPIError("Failed to get company from Connect API")
