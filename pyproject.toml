@@ -1,0 +1,25 @@
+[project]
+name = "connect-client"
+version = "0.1.0"
+description = "Official Python library for Connect API interactions"
+readme = "README.md"
+authors = [
+    { name = "Andries Niemandt", email = "andries.niemandt@trintel.co.za" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.32.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/trinity-telecomms/connect-client"
+Issues = "https://github.com/trinity-telecomms/connect-client/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
