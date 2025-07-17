@@ -14,3 +14,4 @@ wheels/
 
 # Tests
 _test_client.py
+.coverage
