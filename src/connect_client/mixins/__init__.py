@@ -63,11 +63,11 @@ class ResourceMixin:
         except Exception:
             raise ConnectAPIError("Failed to make request to Connect API")
 
-    def make_get_request(self, url, headers=None):
+    def make_get_request(self, url, headers=None, params=None):
         request_headers = self._get_auth_headers() if not headers else headers
 
         try:
-            response = requests.get(url, headers=request_headers)
+            response = requests.get(url, headers=request_headers, params=params)
             return response.status_code, response.json()
         except Exception:
             raise ConnectAPIError("Failed to make request to Connect API")
