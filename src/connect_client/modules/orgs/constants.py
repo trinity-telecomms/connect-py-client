@@ -1,8 +1,9 @@
-PATH_MAP = {
+from typing import Dict
+
+PATH_MAP: Dict[str, Dict[str, str]] = {
     "v4": {
         "company_by_id": "orgs/company/{company_id}/",
         "states": "orgs/company/states/",
-        "verify": "auth/verify/",
         "company_folders": "orgs/folders/company/{company_id}/",
     }
 }
