@@ -3,5 +3,6 @@ PATH_MAP = {
         "company_by_id": "orgs/company/{company_id}/",
         "states": "orgs/company/states/",
         "verify": "auth/verify/",
+        "company_folders": "orgs/folders/company/{company_id}/",
     }
 }
