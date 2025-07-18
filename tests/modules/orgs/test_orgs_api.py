@@ -5,7 +5,7 @@ from connect_client.modules.orgs import OrgsAPI
 from connect_client.exceptions import (
     ConnectAPIError,
     ResourceNotFoundError,
-    UnauthorizedError,
+    UnauthorisedError,
 )
 
 
@@ -67,17 +67,31 @@ class TestOrgsAPI:
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
-    def test_get_company_unauthorized(self, mock_request, mock_client):
-        """Test get_company when access unauthorized"""
-        mock_request.side_effect = UnauthorizedError("Request not authorised")
+    def test_get_company_unauthorised(self, mock_request, mock_client):
+        """Test get_company when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
 
         assert result == {
             "error": "unauthorised",
-            "message": "Unauthorised request",
+            "message": "Authorisation failed",
             "status_code": 401,
+        }
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_company_forbidden(self, mock_request, mock_client):
+        """Test get_company when access forbidden"""
+        mock_request.side_effect = PermissionError("You are not authorised to access this resource")
+        orgs_api = OrgsAPI(mock_client)
+
+        result = orgs_api.get_company(1)
+
+        assert result == {
+            "error": "forbidden",
+            "message": "You do not have permission to access this resource",
+            "status_code": 403,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -178,17 +192,31 @@ class TestOrgsAPI:
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
-    def test_get_company_folders_unauthorized(self, mock_request, mock_client):
-        """Test get_company_folders when access unauthorized"""
-        mock_request.side_effect = UnauthorizedError("Request not authorised")
+    def test_get_company_folders_unauthorised(self, mock_request, mock_client):
+        """Test get_company_folders when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
 
         assert result == {
             "error": "unauthorised",
-            "message": "Unauthorised request",
+            "message": "Authorisation failed",
             "status_code": 401,
+        }
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_company_folders_forbidden(self, mock_request, mock_client):
+        """Test get_company_folders when access forbidden"""
+        mock_request.side_effect = PermissionError("You are not authorised to access this resource")
+        orgs_api = OrgsAPI(mock_client)
+
+        result = orgs_api.get_company_folders(1)
+
+        assert result == {
+            "error": "forbidden",
+            "message": "You do not have permission to access this resource",
+            "status_code": 403,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")

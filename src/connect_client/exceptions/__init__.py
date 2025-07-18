@@ -8,6 +8,6 @@ class ConnectAPIError(Exception):
         super().__init__(message)
 
 
-class UnauthorizedError(Exception):
+class UnauthorisedError(Exception):
     def __init__(self, message):
         super().__init__(message)

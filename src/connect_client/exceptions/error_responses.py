@@ -19,7 +19,7 @@ class ErrorResponse:
         }
 
     @staticmethod
-    def unauthorized() -> Dict[str, Any]:
+    def unauthorised() -> Dict[str, Any]:
         """
         Create a standardised 401 error response.
 
@@ -27,8 +27,21 @@ class ErrorResponse:
         """
         return {
             "error": "unauthorised",
-            "message": "Unauthorised request",
+            "message": "Authorisation failed",
             "status_code": 401,
+        }
+
+    @staticmethod
+    def forbidden() -> Dict[str, Any]:
+        """
+        Create a standardised 403 error response.
+
+        :return: Standardised error response dictionary
+        """
+        return {
+            "error": "forbidden",
+            "message": "You do not have permission to access this resource",
+            "status_code": 403,
         }
 
     @staticmethod
