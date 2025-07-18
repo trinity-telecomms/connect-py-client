@@ -83,7 +83,9 @@ class TestOrgsAPI:
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_forbidden(self, mock_request, mock_client):
         """Test get_company when access forbidden"""
-        mock_request.side_effect = PermissionError("You are not authorised to access this resource")
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
@@ -208,7 +210,9 @@ class TestOrgsAPI:
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_forbidden(self, mock_request, mock_client):
         """Test get_company_folders when access forbidden"""
-        mock_request.side_effect = PermissionError("You are not authorised to access this resource")
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
