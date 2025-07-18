@@ -1,6 +1,10 @@
 import requests
 
-from connect_client.exceptions import ConnectAPIError
+from connect_client.exceptions import (
+    ConnectAPIError,
+    ResourceNotFoundError,
+    UnauthorizedError,
+)
 
 
 class ResourceMixin:
@@ -68,6 +72,14 @@ class ResourceMixin:
 
         try:
             response = requests.get(url, headers=request_headers, params=params)
-            return response.status_code, response.json()
         except Exception:
             raise ConnectAPIError("Failed to make request to Connect API")
+
+        if response.status_code == 401 or response.status_code == 403:
+            raise UnauthorizedError("Request not authorised")
+        if response.status_code == 404:
+            raise ResourceNotFoundError("Requested resource not found")
+        if response.status_code != 200:
+            raise ConnectAPIError("Failed to make request to Connect API")
+
+        return response.json()
