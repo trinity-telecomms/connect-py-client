@@ -26,7 +26,7 @@ class TestOrgsAPI:
         mock_request.return_value = mock_company_response
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company(1)
+        result = orgs_api.get(1)
 
         assert result == mock_company_response
         mock_request.assert_called_once()
@@ -35,22 +35,22 @@ class TestOrgsAPI:
         """Test get_company with invalid ID type"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company("invalid")
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get("invalid")
 
     def test_get_company_invalid_id_zero(self, mock_client):
         """Test get_company with zero ID"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company(0)
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get(0)
 
     def test_get_company_invalid_id_negative(self, mock_client):
         """Test get_company with negative ID"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company(-1)
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get(-1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_not_found(self, mock_request, mock_client):
@@ -58,13 +58,8 @@ class TestOrgsAPI:
         mock_request.side_effect = ResourceNotFoundError("Requested resource not found")
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company(1)
-
-        assert result == {
-            "error": "not_found",
-            "message": "Company not found",
-            "status_code": 404,
-        }
+        with pytest.raises(ResourceNotFoundError, match="Requested resource not found"):
+            orgs_api.get(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_unauthorised(self, mock_request, mock_client):
@@ -72,13 +67,8 @@ class TestOrgsAPI:
         mock_request.side_effect = UnauthorisedError("Request not authorised")
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company(1)
-
-        assert result == {
-            "error": "unauthorised",
-            "message": "Authorisation failed",
-            "status_code": 401,
-        }
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            orgs_api.get(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_forbidden(self, mock_request, mock_client):
@@ -88,13 +78,10 @@ class TestOrgsAPI:
         )
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company(1)
-
-        assert result == {
-            "error": "forbidden",
-            "message": "You do not have permission to access this resource",
-            "status_code": 403,
-        }
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            orgs_api.get(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_server_error(self, mock_request, mock_client):
@@ -104,29 +91,10 @@ class TestOrgsAPI:
         )
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company(1)
-
-        assert result == {
-            "error": "api_error",
-            "message": "Connect API error",
-            "status_code": 500,
-        }
-
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
-    def test_get_company_api_error(self, mock_request, mock_client):
-        """Test get_company with API error"""
-        mock_request.side_effect = ConnectAPIError(
-            "Failed to make request to Connect API"
-        )
-        orgs_api = OrgsAPI(mock_client)
-
-        result = orgs_api.get_company(1)
-
-        assert result == {
-            "error": "api_error",
-            "message": "Connect API error",
-            "status_code": 500,
-        }
+        with pytest.raises(
+            ConnectAPIError, match="Failed to make request to Connect API"
+        ):
+            orgs_api.get(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_success(
@@ -136,7 +104,7 @@ class TestOrgsAPI:
         mock_request.return_value = mock_company_folders_response
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
+        result = orgs_api.get_folders(1)
 
         assert result == mock_company_folders_response
         mock_request.assert_called_once()
@@ -150,7 +118,7 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         filters = {"active": True, "limit": 10}
-        result = orgs_api.get_company_folders(1, **filters)
+        result = orgs_api.get_folders(1, **filters)
 
         assert result == mock_company_folders_response
         mock_request.assert_called_once()
@@ -162,22 +130,22 @@ class TestOrgsAPI:
         """Test get_company_folders with invalid ID type"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company_folders("invalid")
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folders("invalid")
 
     def test_get_company_folders_invalid_id_zero(self, mock_client):
         """Test get_company_folders with zero ID"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company_folders(0)
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folders(0)
 
     def test_get_company_folders_invalid_id_negative(self, mock_client):
         """Test get_company_folders with negative ID"""
         orgs_api = OrgsAPI(mock_client)
 
-        with pytest.raises(ValueError, match="company_id must be a positive integer"):
-            orgs_api.get_company_folders(-1)
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folders(-1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_not_found(self, mock_request, mock_client):
@@ -185,13 +153,8 @@ class TestOrgsAPI:
         mock_request.side_effect = ResourceNotFoundError("Not found")
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
-
-        assert result == {
-            "error": "not_found",
-            "message": "Company not found",
-            "status_code": 404,
-        }
+        with pytest.raises(ResourceNotFoundError, match="Not found"):
+            orgs_api.get_folders(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_unauthorised(self, mock_request, mock_client):
@@ -199,13 +162,8 @@ class TestOrgsAPI:
         mock_request.side_effect = UnauthorisedError("Request not authorised")
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
-
-        assert result == {
-            "error": "unauthorised",
-            "message": "Authorisation failed",
-            "status_code": 401,
-        }
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            orgs_api.get_folders(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_forbidden(self, mock_request, mock_client):
@@ -215,13 +173,10 @@ class TestOrgsAPI:
         )
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
-
-        assert result == {
-            "error": "forbidden",
-            "message": "You do not have permission to access this resource",
-            "status_code": 403,
-        }
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            orgs_api.get_folders(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_server_error(self, mock_request, mock_client):
@@ -229,13 +184,8 @@ class TestOrgsAPI:
         mock_request.side_effect = ConnectAPIError("ERR")
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
-
-        assert result == {
-            "error": "api_error",
-            "message": "Connect API error",
-            "status_code": 500,
-        }
+        with pytest.raises(ConnectAPIError, match="ERR"):
+            orgs_api.get_folders(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_unexpected_exception(self, mock_request, mock_client):
@@ -245,13 +195,10 @@ class TestOrgsAPI:
         )
         orgs_api = OrgsAPI(mock_client)
 
-        result = orgs_api.get_company_folders(1)
-
-        assert result == {
-            "error": "api_error",
-            "message": "Connect API error",
-            "status_code": 500,
-        }
+        with pytest.raises(
+            ConnectAPIError, match="Failed to make request to Connect API"
+        ):
+            orgs_api.get_folders(1)
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_url_generation(self, mock_request, mock_client):
@@ -266,8 +213,127 @@ class TestOrgsAPI:
                 "https://api.example.com/api/v4/orgs/company/1/"
             )
 
-            orgs_api.get_company(1)
+            orgs_api.get(1)
 
             mock_generate.assert_called_once_with(
                 "company_by_id", PATH_MAP, company_id=1
+            )
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_success(self, mock_request, mock_client, mock_company_folders_response):
+        """Test successful folder retrieval"""
+        mock_request.return_value = mock_company_folders_response
+        orgs_api = OrgsAPI(mock_client)
+
+        result = orgs_api.get_folder(1)
+
+        assert result == mock_company_folders_response
+        mock_request.assert_called_once()
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_with_filters(self, mock_request, mock_client, mock_company_folders_response):
+        """Test folder retrieval with filters"""
+        mock_request.return_value = mock_company_folders_response
+        orgs_api = OrgsAPI(mock_client)
+
+        filters = {"active": True, "limit": 10}
+        result = orgs_api.get_folder(1, **filters)
+
+        assert result == mock_company_folders_response
+        mock_request.assert_called_once()
+        # Check that params were passed correctly
+        call_args = mock_request.call_args
+        assert call_args[1]["params"] == filters
+
+    def test_get_folder_invalid_id_type(self, mock_client):
+        """Test get_folder with invalid ID type"""
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folder("invalid")
+
+    def test_get_folder_invalid_id_zero(self, mock_client):
+        """Test get_folder with zero ID"""
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folder(0)
+
+    def test_get_folder_invalid_id_negative(self, mock_client):
+        """Test get_folder with negative ID"""
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            orgs_api.get_folder(-1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_not_found(self, mock_request, mock_client):
+        """Test get_folder when folder not found"""
+        mock_request.side_effect = ResourceNotFoundError("Not found")
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Not found"):
+            orgs_api.get_folder(1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_unauthorised(self, mock_request, mock_client):
+        """Test get_folder when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            orgs_api.get_folder(1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_forbidden(self, mock_request, mock_client):
+        """Test get_folder when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            orgs_api.get_folder(1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_server_error(self, mock_request, mock_client):
+        """Test get_folder with server error"""
+        mock_request.side_effect = ConnectAPIError("ERR")
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="ERR"):
+            orgs_api.get_folder(1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_unexpected_exception(self, mock_request, mock_client):
+        """Test get_folder with unexpected exception"""
+        mock_request.side_effect = ConnectAPIError(
+            "Failed to make request to Connect API"
+        )
+        orgs_api = OrgsAPI(mock_client)
+
+        with pytest.raises(
+            ConnectAPIError, match="Failed to make request to Connect API"
+        ):
+            orgs_api.get_folder(1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_folder_url_generation(self, mock_request, mock_client):
+        """Test URL generation for folder endpoint"""
+        mock_request.return_value = {"id": 1}
+        orgs_api = OrgsAPI(mock_client)
+
+        from connect_client.modules.orgs.constants import PATH_MAP
+
+        with patch.object(orgs_api, "_generate_url") as mock_generate:
+            mock_generate.return_value = (
+                "https://api.example.com/api/v4/orgs/folder/1/"
+            )
+
+            orgs_api.get_folder(1)
+
+            mock_generate.assert_called_once_with(
+                "folder_by_id", PATH_MAP, folder_id=1
             )
