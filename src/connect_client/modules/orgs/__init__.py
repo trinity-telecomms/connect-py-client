@@ -1,6 +1,6 @@
 from typing import Dict, List, Any, Union
 
-from connect_client.exceptions import UnauthorizedError, ResourceNotFoundError
+from connect_client.exceptions import UnauthorisedError, ResourceNotFoundError
 from connect_client.exceptions.error_responses import ErrorResponse
 from connect_client.mixins import ResourceMixin
 from .constants import PATH_MAP
@@ -22,8 +22,10 @@ class OrgsAPI(ResourceMixin):
 
         try:
             return self.make_get_request(url)
-        except UnauthorizedError:
-            return ErrorResponse.unauthorized()
+        except UnauthorisedError:
+            return ErrorResponse.unauthorised()
+        except PermissionError:
+            return ErrorResponse.forbidden()
         except ResourceNotFoundError:
             return ErrorResponse.not_found("Company")
         except Exception:
@@ -47,8 +49,10 @@ class OrgsAPI(ResourceMixin):
 
         try:
             return self.make_get_request(url, params=filters)
-        except UnauthorizedError:
-            return ErrorResponse.unauthorized()
+        except UnauthorisedError:
+            return ErrorResponse.unauthorised()
+        except PermissionError:
+            return ErrorResponse.forbidden()
         except ResourceNotFoundError:
             return ErrorResponse.not_found("Company")
         except Exception:

@@ -14,13 +14,13 @@ class TestErrorResponse:
             "status_code": 404,
         }
 
-    def test_unauthorized_response(self):
-        """Test unauthorized error response creation"""
-        response = ErrorResponse.unauthorized()
+    def test_unauthorised_response(self):
+        """Test unauthorised error response creation"""
+        response = ErrorResponse.unauthorised()
 
         assert response == {
             "error": "unauthorised",
-            "message": "Unauthorised request",
+            "message": "Authorisation failed",
             "status_code": 401,
         }
 
