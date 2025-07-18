@@ -2,7 +2,11 @@ import pytest
 from unittest.mock import patch
 
 from connect_client.modules.orgs import OrgsAPI
-from connect_client.exceptions import ConnectAPIError, ResourceNotFoundError, UnauthorizedError
+from connect_client.exceptions import (
+    ConnectAPIError,
+    ResourceNotFoundError,
+    UnauthorizedError,
+)
 
 
 class TestOrgsAPI:
@@ -55,11 +59,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
-        
+
         assert result == {
             "error": "not_found",
             "message": "Company not found",
-            "status_code": 404
+            "status_code": 404,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -69,25 +73,27 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
-        
+
         assert result == {
             "error": "unauthorised",
             "message": "Unauthorised request",
-            "status_code": 401
+            "status_code": 401,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_server_error(self, mock_request, mock_client):
         """Test get_company with server error"""
-        mock_request.side_effect = ConnectAPIError("Failed to make request to Connect API")
+        mock_request.side_effect = ConnectAPIError(
+            "Failed to make request to Connect API"
+        )
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
-        
+
         assert result == {
             "error": "api_error",
             "message": "Connect API error",
-            "status_code": 500
+            "status_code": 500,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -99,11 +105,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company(1)
-        
+
         assert result == {
             "error": "api_error",
             "message": "Connect API error",
-            "status_code": 500
+            "status_code": 500,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -164,11 +170,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
-        
+
         assert result == {
             "error": "not_found",
             "message": "Company not found",
-            "status_code": 404
+            "status_code": 404,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -178,11 +184,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
-        
+
         assert result == {
             "error": "unauthorised",
             "message": "Unauthorised request",
-            "status_code": 401
+            "status_code": 401,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -192,11 +198,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
-        
+
         assert result == {
             "error": "api_error",
             "message": "Connect API error",
-            "status_code": 500
+            "status_code": 500,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
@@ -208,11 +214,11 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         result = orgs_api.get_company_folders(1)
-        
+
         assert result == {
             "error": "api_error",
             "message": "Connect API error",
-            "status_code": 500
+            "status_code": 500,
         }
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")

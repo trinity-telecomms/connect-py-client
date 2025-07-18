@@ -29,8 +29,9 @@ class OrgsAPI(ResourceMixin):
         except Exception:
             return ErrorResponse.api_error()
 
-    def get_company_folders(self, company_id: int, **filters) -> Union[
-        List[Dict[str, Any]], Dict[str, Any]]:
+    def get_company_folders(
+        self, company_id: int, **filters
+    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         """
         GET company folders for a given company ID.
 
