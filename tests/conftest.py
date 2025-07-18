@@ -69,3 +69,16 @@ def mock_company_folders_response():
             "created_at": "2023-01-01T00:00:00Z",
         },
     ]
+
+
+@pytest.fixture
+def mock_device_response():
+    """Mock device response"""
+    return {
+        "id": 1,
+        "uid": "test-uid-123",
+        "name": "Test Device",
+        "status": "active",
+        "type": "sensor",
+        "created_at": "2023-01-01T00:00:00Z",
+    }
