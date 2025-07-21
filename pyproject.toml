@@ -1,9 +1,10 @@
 [project]
 name = "connect-client"
-version = "0.1.3"
+version = "0.1.4"
 description = "Official Python library for Connect API interactions"
 readme = "README.md"
 authors = [
+    { name = "Jan Badenhorst", email = "jan.badenhorst@trintel.co.za" },
     { name = "Andries Niemandt", email = "andries.niemandt@trintel.co.za" }
 ]
 classifiers = [

@@ -465,7 +465,9 @@ class TestDevicesAPI:
         devices_api = DevicesAPI(mock_client)
         command = {"rpc": "test", "args": [], "pid": "0", "ttl": -1, "qos": 0}
 
-        with pytest.raises(ValueError, match="Command 'ttl' must be a non-negative number"):
+        with pytest.raises(
+            ValueError, match="Command 'ttl' must be a non-negative number"
+        ):
             devices_api.issue_command(1, command)
 
     def test_issue_command_invalid_qos_negative(self, mock_client):
@@ -473,7 +475,9 @@ class TestDevicesAPI:
         devices_api = DevicesAPI(mock_client)
         command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": -1}
 
-        with pytest.raises(ValueError, match="Command 'qos' must be a non-negative integer"):
+        with pytest.raises(
+            ValueError, match="Command 'qos' must be a non-negative integer"
+        ):
             devices_api.issue_command(1, command)
 
     @patch("connect_client.mixins.ResourceMixin.make_post_request")
@@ -507,29 +511,35 @@ class TestDevicesAPI:
     def test_move_to_folder_data_structure(self, mock_request, mock_client):
         """Test move_to_folder sends correct data structure"""
         devices_api = DevicesAPI(mock_client)
-        
+
         devices_api.move_to_folder(1, 5)
-        
+
         _, kwargs = mock_request.call_args
-        assert kwargs['json'] == {"folder": 5}
+        assert kwargs["json"] == {"folder": 5}
 
     @patch("connect_client.mixins.ResourceMixin.make_patch_request")
     def test_set_lifecycle_data_structure(self, mock_request, mock_client):
         """Test set_lifecycle sends correct data structure"""
         devices_api = DevicesAPI(mock_client)
-        
+
         devices_api.set_lifecycle(1, 3)
-        
+
         _, kwargs = mock_request.call_args
-        assert kwargs['json'] == {"state": 3}
+        assert kwargs["json"] == {"state": 3}
 
     @patch("connect_client.mixins.ResourceMixin.make_post_request")
     def test_issue_command_data_structure(self, mock_request, mock_client):
         """Test issue_command sends correct data structure"""
         devices_api = DevicesAPI(mock_client)
-        command = {"rpc": "reboot", "args": ["force"], "pid": "123", "ttl": 600, "qos": 1}
-        
+        command = {
+            "rpc": "reboot",
+            "args": ["force"],
+            "pid": "123",
+            "ttl": 600,
+            "qos": 1,
+        }
+
         devices_api.issue_command(1, command)
-        
+
         _, kwargs = mock_request.call_args
-        assert kwargs['json'] == command
+        assert kwargs["json"] == command

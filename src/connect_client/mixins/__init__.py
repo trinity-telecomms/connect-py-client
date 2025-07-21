@@ -94,3 +94,14 @@ class ResourceMixin:
             raise ConnectAPIError("Connect API returned unexpected status code")
 
         return response.json()
+
+    def get_linked_resource(self, url):
+        """
+        Helper method to get a linked resource from a previous interaction.
+        Some APIs return URLs in the response for related resources, previous or next
+        pages etc.
+
+        :param url:
+        :return:
+        """
+        return self.make_get_request(url)

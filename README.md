@@ -22,13 +22,13 @@ with comprehensive error handling, type hints, and good test coverage.
 ### Using uv (recommended)
 
 ```bash
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.1.0-alpha
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.1.4
 ```
 
 ### Using pip
 
 ```bash
-pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.0-alpha
+pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.4
 ```
 
 ## Quick Start
