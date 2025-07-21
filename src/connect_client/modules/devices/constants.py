@@ -6,5 +6,7 @@ PATH_MAP = {
         "device_events_by_uid": "devices/uid/{device_uid}/data/events/",
         "list_by_folder": "devices/folder/{folder_id}/",
         "list_by_folder_lite": "devices/folder/{folder_id}/lite/",
+        "issue_command": "devices/{device_id}/command/send/",
+        "issue_command_by_uid": "devices/uid/{device_uid}/command/send/",
     }
 }

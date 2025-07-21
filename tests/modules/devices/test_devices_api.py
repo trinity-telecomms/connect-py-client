@@ -308,3 +308,228 @@ class TestDevicesAPI:
             mock_generate.assert_called_once_with(
                 "device_events_by_uid", PATH_MAP, device_uid="test-uid-123"
             )
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_move_to_folder_success(self, mock_request, mock_client):
+        """Test successful device move to folder by ID"""
+        mock_request.return_value = {"success": True}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.move_to_folder(1, 2)
+
+        assert result == {"success": True}
+        mock_request.assert_called_once()
+
+    def test_move_to_folder_invalid_device_id(self, mock_client):
+        """Test move_to_folder with invalid device ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.move_to_folder(-1, 2)
+
+    def test_move_to_folder_invalid_folder_id(self, mock_client):
+        """Test move_to_folder with invalid folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.move_to_folder(1, 0)
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_move_to_folder_by_uid_success(self, mock_request, mock_client):
+        """Test successful device move to folder by UID"""
+        mock_request.return_value = {"success": True}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.move_to_folder_by_uid("test-uid-123", 2)
+
+        assert result == {"success": True}
+        mock_request.assert_called_once()
+
+    def test_move_to_folder_by_uid_invalid_uid(self, mock_client):
+        """Test move_to_folder_by_uid with invalid UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.move_to_folder_by_uid("", 2)
+
+    def test_move_to_folder_by_uid_invalid_folder_id(self, mock_client):
+        """Test move_to_folder_by_uid with invalid folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.move_to_folder_by_uid("test-uid-123", -1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_set_lifecycle_success(self, mock_request, mock_client):
+        """Test successful lifecycle state change by ID"""
+        mock_request.return_value = {"state": 2}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.set_lifecycle(1, 2)
+
+        assert result == {"state": 2}
+        mock_request.assert_called_once()
+
+    def test_set_lifecycle_invalid_device_id(self, mock_client):
+        """Test set_lifecycle with invalid device ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.set_lifecycle("invalid", 2)
+
+    def test_set_lifecycle_invalid_state(self, mock_client):
+        """Test set_lifecycle with invalid target state"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.set_lifecycle(1, -1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_set_lifecycle_by_uid_success(self, mock_request, mock_client):
+        """Test successful lifecycle state change by UID"""
+        mock_request.return_value = {"state": 2}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.set_lifecycle_by_uid("test-uid-123", 2)
+
+        assert result == {"state": 2}
+        mock_request.assert_called_once()
+
+    def test_set_lifecycle_by_uid_invalid_uid(self, mock_client):
+        """Test set_lifecycle_by_uid with invalid UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.set_lifecycle_by_uid(None, 2)
+
+    def test_set_lifecycle_by_uid_invalid_state(self, mock_client):
+        """Test set_lifecycle_by_uid with invalid target state"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.set_lifecycle_by_uid("test-uid-123", 0)
+
+    @patch("connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_command_success(self, mock_request, mock_client):
+        """Test successful command issue by ID"""
+        mock_request.return_value = {"status": "sent"}
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": 0}
+
+        result = devices_api.issue_command(1, command)
+
+        assert result == {"status": "sent"}
+        mock_request.assert_called_once()
+
+    def test_issue_command_invalid_device_id(self, mock_client):
+        """Test issue_command with invalid device ID"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": 0}
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.issue_command(0, command)
+
+    def test_issue_command_invalid_command_type(self, mock_client):
+        """Test issue_command with invalid command type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Command must be a dictionary"):
+            devices_api.issue_command(1, "invalid")
+
+    def test_issue_command_missing_fields(self, mock_client):
+        """Test issue_command with missing command fields"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test"}
+
+        with pytest.raises(ValueError, match="Command missing required fields"):
+            devices_api.issue_command(1, command)
+
+    def test_issue_command_invalid_rpc_type(self, mock_client):
+        """Test issue_command with invalid rpc type"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": 123, "args": [], "pid": "0", "ttl": 300, "qos": 0}
+
+        with pytest.raises(ValueError, match="Command 'rpc' must be a string"):
+            devices_api.issue_command(1, command)
+
+    def test_issue_command_invalid_args_type(self, mock_client):
+        """Test issue_command with invalid args type"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": "invalid", "pid": "0", "ttl": 300, "qos": 0}
+
+        with pytest.raises(ValueError, match="Command 'args' must be a list"):
+            devices_api.issue_command(1, command)
+
+    def test_issue_command_invalid_ttl_negative(self, mock_client):
+        """Test issue_command with negative ttl"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": -1, "qos": 0}
+
+        with pytest.raises(ValueError, match="Command 'ttl' must be a non-negative number"):
+            devices_api.issue_command(1, command)
+
+    def test_issue_command_invalid_qos_negative(self, mock_client):
+        """Test issue_command with negative qos"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": -1}
+
+        with pytest.raises(ValueError, match="Command 'qos' must be a non-negative integer"):
+            devices_api.issue_command(1, command)
+
+    @patch("connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_command_by_uid_success(self, mock_request, mock_client):
+        """Test successful command issue by UID"""
+        mock_request.return_value = {"status": "sent"}
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": 0}
+
+        result = devices_api.issue_command_by_uid("test-uid-123", command)
+
+        assert result == {"status": "sent"}
+        mock_request.assert_called_once()
+
+    def test_issue_command_by_uid_invalid_uid(self, mock_client):
+        """Test issue_command_by_uid with invalid UID"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "test", "args": [], "pid": "0", "ttl": 300, "qos": 0}
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.issue_command_by_uid("   ", command)
+
+    def test_issue_command_by_uid_invalid_command(self, mock_client):
+        """Test issue_command_by_uid with invalid command"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Command must be a dictionary"):
+            devices_api.issue_command_by_uid("test-uid-123", [])
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_move_to_folder_data_structure(self, mock_request, mock_client):
+        """Test move_to_folder sends correct data structure"""
+        devices_api = DevicesAPI(mock_client)
+        
+        devices_api.move_to_folder(1, 5)
+        
+        _, kwargs = mock_request.call_args
+        assert kwargs['json'] == {"folder": 5}
+
+    @patch("connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_set_lifecycle_data_structure(self, mock_request, mock_client):
+        """Test set_lifecycle sends correct data structure"""
+        devices_api = DevicesAPI(mock_client)
+        
+        devices_api.set_lifecycle(1, 3)
+        
+        _, kwargs = mock_request.call_args
+        assert kwargs['json'] == {"state": 3}
+
+    @patch("connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_command_data_structure(self, mock_request, mock_client):
+        """Test issue_command sends correct data structure"""
+        devices_api = DevicesAPI(mock_client)
+        command = {"rpc": "reboot", "args": ["force"], "pid": "123", "ttl": 600, "qos": 1}
+        
+        devices_api.issue_command(1, command)
+        
+        _, kwargs = mock_request.call_args
+        assert kwargs['json'] == command
