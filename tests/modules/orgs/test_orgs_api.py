@@ -220,7 +220,9 @@ class TestOrgsAPI:
             )
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
-    def test_get_folder_success(self, mock_request, mock_client, mock_company_folders_response):
+    def test_get_folder_success(
+        self, mock_request, mock_client, mock_company_folders_response
+    ):
         """Test successful folder retrieval"""
         mock_request.return_value = mock_company_folders_response
         orgs_api = OrgsAPI(mock_client)
@@ -231,7 +233,9 @@ class TestOrgsAPI:
         mock_request.assert_called_once()
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
-    def test_get_folder_with_filters(self, mock_request, mock_client, mock_company_folders_response):
+    def test_get_folder_with_filters(
+        self, mock_request, mock_client, mock_company_folders_response
+    ):
         """Test folder retrieval with filters"""
         mock_request.return_value = mock_company_folders_response
         orgs_api = OrgsAPI(mock_client)
@@ -328,12 +332,8 @@ class TestOrgsAPI:
         from connect_client.modules.orgs.constants import PATH_MAP
 
         with patch.object(orgs_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
-                "https://api.example.com/api/v4/orgs/folder/1/"
-            )
+            mock_generate.return_value = "https://api.example.com/api/v4/orgs/folder/1/"
 
             orgs_api.get_folder(1)
 
-            mock_generate.assert_called_once_with(
-                "folder_by_id", PATH_MAP, folder_id=1
-            )
+            mock_generate.assert_called_once_with("folder_by_id", PATH_MAP, folder_id=1)

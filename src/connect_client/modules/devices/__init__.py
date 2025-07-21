@@ -60,3 +60,31 @@ class DevicesAPI(ResourceMixin):
             "device_events_by_uid", PATH_MAP, device_uid=device_uid
         )
         return self.make_get_request(url, params=filters)
+
+    @handle_exceptions
+    def list_by_folder(self, folder_id: int, **filters: str) -> list[dict[str, Any]]:
+        """
+        GET devices for a folder by ID.
+
+        :param folder_id:
+        :param filters:
+        :return:
+        """
+        validate_id(folder_id)
+        url = self._generate_url("list_by_folder", PATH_MAP, folder_id=folder_id)
+        return self.make_get_request(url, params=filters)
+
+    @handle_exceptions
+    def list_by_folder_lite(
+        self, folder_id: int, **filters: str
+    ) -> list[dict[str, Any]]:
+        """
+        GET devices for a folder by ID.
+
+        :param folder_id:
+        :param filters:
+        :return:
+        """
+        validate_id(folder_id)
+        url = self._generate_url("list_by_folder_lite", PATH_MAP, folder_id=folder_id)
+        return self.make_get_request(url, params=filters)

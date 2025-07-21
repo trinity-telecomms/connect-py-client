@@ -20,8 +20,9 @@ class OrgsAPI(ResourceMixin):
         return self.make_get_request(url)
 
     @handle_exceptions
-    def get_folder(self, folder_id: int, **filters
-                   ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    def get_folder(
+        self, folder_id: int, **filters
+    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         """
         GET folder for a given folder ID.
 
@@ -35,7 +36,7 @@ class OrgsAPI(ResourceMixin):
 
     @handle_exceptions
     def get_folders(
-            self, company_id: int, **filters
+        self, company_id: int, **filters
     ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         """
         GET company folders for a given company ID.
