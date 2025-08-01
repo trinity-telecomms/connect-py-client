@@ -62,6 +62,12 @@ class DevicesAPI(ResourceMixin):
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
+    def list_by_folder(self, folder_id: int, **filters: str) -> list[dict[str, Any]]:
+        validate_id(folder_id)
+        url = self._generate_url("list_by_folder", PATH_MAP, folder_id=folder_id)
+        return self.make_get_request(url, params=filters)
+
+    @handle_exceptions
     def move_to_folder(self, device_id: int, folder_id: int) -> dict[str, Any]:
         """
         Move a device identified by ID to a folder identified by ID.
