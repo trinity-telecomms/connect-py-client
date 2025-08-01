@@ -543,3 +543,124 @@ class TestDevicesAPI:
 
         _, kwargs = mock_request.call_args
         assert kwargs["json"] == command
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_success(self, mock_request, mock_client):
+        """Test successful device list retrieval by folder ID"""
+        mock_response = [
+            {"id": 1, "uid": "device-1", "name": "Device 1"},
+            {"id": 2, "uid": "device-2", "name": "Device 2"},
+        ]
+        mock_request.return_value = mock_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder(5)
+
+        assert result == mock_response
+        mock_request.assert_called_once()
+
+    def test_list_by_folder_invalid_id_type(self, mock_client):
+        """Test list_by_folder with invalid folder ID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder("invalid")
+
+    def test_list_by_folder_invalid_id_zero(self, mock_client):
+        """Test list_by_folder with zero folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder(0)
+
+    def test_list_by_folder_invalid_id_negative(self, mock_client):
+        """Test list_by_folder with negative folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder(-1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_with_filters(self, mock_request, mock_client):
+        """Test list_by_folder with filter parameters"""
+        mock_response = [{"id": 1, "uid": "device-1", "name": "Device 1"}]
+        mock_request.return_value = mock_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder(5, limit="10", offset="0", status="active")
+
+        assert result == mock_response
+        mock_request.assert_called_once_with(
+            mock_request.call_args[0][0],
+            params={"limit": "10", "offset": "0", "status": "active"}
+        )
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_empty_result(self, mock_request, mock_client):
+        """Test list_by_folder when folder has no devices"""
+        mock_request.return_value = []
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder(5)
+
+        assert result == []
+        mock_request.assert_called_once()
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_not_found(self, mock_request, mock_client):
+        """Test list_by_folder when folder not found"""
+        mock_request.side_effect = ResourceNotFoundError("Folder not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Folder not found"):
+            devices_api.list_by_folder(999)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_unauthorised(self, mock_request, mock_client):
+        """Test list_by_folder when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            devices_api.list_by_folder(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_forbidden(self, mock_request, mock_client):
+        """Test list_by_folder when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            devices_api.list_by_folder(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_server_error(self, mock_request, mock_client):
+        """Test list_by_folder with server error"""
+        mock_request.side_effect = ConnectAPIError("Server error")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="Server error"):
+            devices_api.list_by_folder(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_url_generation(self, mock_request, mock_client):
+        """Test URL generation for list_by_folder endpoint"""
+        mock_request.return_value = []
+        devices_api = DevicesAPI(mock_client)
+
+        from connect_client.modules.devices.constants import PATH_MAP
+
+        with patch.object(devices_api, "_generate_url") as mock_generate:
+            mock_generate.return_value = (
+                "https://api.example.com/api/v4/devices/folder/5/"
+            )
+
+            devices_api.list_by_folder(5)
+
+            mock_generate.assert_called_once_with(
+                "list_by_folder", PATH_MAP, folder_id=5
+            )
