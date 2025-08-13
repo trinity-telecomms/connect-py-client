@@ -592,7 +592,7 @@ class TestDevicesAPI:
         assert result == mock_response
         mock_request.assert_called_once_with(
             mock_request.call_args[0][0],
-            params={"limit": "10", "offset": "0", "status": "active"}
+            params={"limit": "10", "offset": "0", "status": "active"},
         )
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")

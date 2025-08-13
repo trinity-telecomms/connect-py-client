@@ -75,7 +75,9 @@ class DevicesAPI(ResourceMixin):
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
-    def list_by_folder_lite(self, folder_id: int, **filters: str) -> list[dict[str, Any]]:
+    def list_by_folder_lite(
+        self, folder_id: int, **filters: str
+    ) -> list[dict[str, Any]]:
         """
         GET lightweight list of devices by folder ID.
 
