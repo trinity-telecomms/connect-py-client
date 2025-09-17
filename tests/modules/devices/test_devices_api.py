@@ -309,6 +309,116 @@ class TestDevicesAPI:
                 "device_events_by_uid", PATH_MAP, device_uid="test-uid-123"
             )
 
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_success(
+        self, mock_request, mock_client, mock_device_response
+    ):
+        """Test successful commands retrieval by UID"""
+        mock_request.return_value = mock_device_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.get_commands_by_uid("test-uid-123")
+
+        assert result == mock_device_response
+        mock_request.assert_called_once()
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_with_filters(
+        self, mock_request, mock_client, mock_device_response
+    ):
+        """Test commands retrieval with filters"""
+        mock_request.return_value = mock_device_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.get_commands_by_uid(
+            "test-uid-123", status="sent", limit="5"
+        )
+
+        assert result == mock_device_response
+        mock_request.assert_called_once_with(
+            mock_request.call_args[0][0], params={"status": "sent", "limit": "5"}
+        )
+
+    def test_get_commands_by_uid_invalid_uid_type(self, mock_client):
+        """Test get_commands_by_uid with invalid UID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.get_commands_by_uid(123)
+
+    def test_get_commands_by_uid_empty_uid(self, mock_client):
+        """Test get_commands_by_uid with empty UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.get_commands_by_uid("")
+
+    def test_get_commands_by_uid_whitespace_uid(self, mock_client):
+        """Test get_commands_by_uid with whitespace-only UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.get_commands_by_uid("   ")
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_not_found(self, mock_request, mock_client):
+        """Test get_commands_by_uid when device not found"""
+        mock_request.side_effect = ResourceNotFoundError("Not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Not found"):
+            devices_api.get_commands_by_uid("test-uid-123")
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_unauthorised(self, mock_request, mock_client):
+        """Test get_commands_by_uid when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            devices_api.get_commands_by_uid("test-uid-123")
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_forbidden(self, mock_request, mock_client):
+        """Test get_commands_by_uid when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            devices_api.get_commands_by_uid("test-uid-123")
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_get_commands_by_uid_server_error(self, mock_request, mock_client):
+        """Test get_commands_by_uid with server error"""
+        mock_request.side_effect = ConnectAPIError("ERR")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="ERR"):
+            devices_api.get_commands_by_uid("test-uid-123")
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_url_generation_commands(self, mock_request, mock_client):
+        """Test URL generation for commands endpoint"""
+        mock_request.return_value = {"commands": []}
+        devices_api = DevicesAPI(mock_client)
+
+        from connect_client.modules.devices.constants import PATH_MAP
+
+        with patch.object(devices_api, "_generate_url") as mock_generate:
+            mock_generate.return_value = (
+                "https://api.example.com/api/v4/devices/uid/test-uid-123/commands/"
+            )
+
+            devices_api.get_commands_by_uid("test-uid-123")
+
+            mock_generate.assert_called_once_with(
+                "device_commands_by_uid", PATH_MAP, device_uid="test-uid-123"
+            )
+
     @patch("connect_client.mixins.ResourceMixin.make_patch_request")
     def test_move_to_folder_success(self, mock_request, mock_client):
         """Test successful device move to folder by ID"""
@@ -663,4 +773,127 @@ class TestDevicesAPI:
 
             mock_generate.assert_called_once_with(
                 "list_by_folder", PATH_MAP, folder_id=5
+            )
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_success(self, mock_request, mock_client):
+        """Test successful lightweight device list retrieval by folder ID"""
+        mock_response = [
+            {"id": 1, "uid": "device-1", "name": "Device 1"},
+            {"id": 2, "uid": "device-2", "name": "Device 2"},
+        ]
+        mock_request.return_value = mock_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder_lite(5)
+
+        assert result == mock_response
+        mock_request.assert_called_once()
+
+    def test_list_by_folder_lite_invalid_id_type(self, mock_client):
+        """Test list_by_folder_lite with invalid folder ID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder_lite("invalid")
+
+    def test_list_by_folder_lite_invalid_id_zero(self, mock_client):
+        """Test list_by_folder_lite with zero folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder_lite(0)
+
+    def test_list_by_folder_lite_invalid_id_negative(self, mock_client):
+        """Test list_by_folder_lite with negative folder ID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.list_by_folder_lite(-1)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_with_filters(self, mock_request, mock_client):
+        """Test list_by_folder_lite with filter parameters"""
+        mock_response = [{"id": 1, "uid": "device-1", "name": "Device 1"}]
+        mock_request.return_value = mock_response
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder_lite(
+            5, limit="10", offset="0", status="active"
+        )
+
+        assert result == mock_response
+        mock_request.assert_called_once_with(
+            mock_request.call_args[0][0],
+            params={"limit": "10", "offset": "0", "status": "active"},
+        )
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_empty_result(self, mock_request, mock_client):
+        """Test list_by_folder_lite when folder has no devices"""
+        mock_request.return_value = []
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.list_by_folder_lite(5)
+
+        assert result == []
+        mock_request.assert_called_once()
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_not_found(self, mock_request, mock_client):
+        """Test list_by_folder_lite when folder not found"""
+        mock_request.side_effect = ResourceNotFoundError("Folder not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Folder not found"):
+            devices_api.list_by_folder_lite(999)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_unauthorised(self, mock_request, mock_client):
+        """Test list_by_folder_lite when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            devices_api.list_by_folder_lite(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_forbidden(self, mock_request, mock_client):
+        """Test list_by_folder_lite when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            devices_api.list_by_folder_lite(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_server_error(self, mock_request, mock_client):
+        """Test list_by_folder_lite with server error"""
+        mock_request.side_effect = ConnectAPIError("Server error")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="Server error"):
+            devices_api.list_by_folder_lite(5)
+
+    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    def test_list_by_folder_lite_url_generation(self, mock_request, mock_client):
+        """Test URL generation for list_by_folder_lite endpoint"""
+        mock_request.return_value = []
+        devices_api = DevicesAPI(mock_client)
+
+        from connect_client.modules.devices.constants import PATH_MAP
+
+        with patch.object(devices_api, "_generate_url") as mock_generate:
+            mock_generate.return_value = (
+                "https://api.example.com/api/v4/devices/folder/5/lite/"
+            )
+
+            devices_api.list_by_folder_lite(5)
+
+            mock_generate.assert_called_once_with(
+                "list_by_folder_lite", PATH_MAP, folder_id=5
             )
