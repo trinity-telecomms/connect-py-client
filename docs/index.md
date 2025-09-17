@@ -7,19 +7,19 @@ A Python client library for interacting with the Trinity IoT Connect API.
 Using `uv`:
 
 ```bash
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.1.7
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
 ```
 
 Using `pip` with `uv`:
 
 ```bash
-uv pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.7
+uv pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
 ```
 
 Using `pip`:
 
 ```bash
-pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.7
+pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
 ```
 
 ## Quick Start
@@ -102,7 +102,7 @@ client = ConnectClient(
 
 ## Version Information
 
-Current version: **0.1.7**
+Current version: **0.1.8**
 
 For more information, visit
 the [GitHub repository](https://github.com/trinity-telecomms/connect-py-client).
