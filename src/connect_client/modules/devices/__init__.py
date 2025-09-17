@@ -53,11 +53,27 @@ class DevicesAPI(ResourceMixin):
         GET events for a device by UID.
 
         :param device_uid: The UID of the device to retrieve
-        :return: A Device object as dictionary or error response
+        :return:
         """
         validate_uid(device_uid)
         url = self._generate_url(
             "device_events_by_uid", PATH_MAP, device_uid=device_uid
+        )
+        return self.make_get_request(url, params=filters)
+
+    @handle_exceptions
+    def get_commands_by_uid(
+            self, device_uid: str, **filters: str
+    ) -> list[dict[str, Any]]:
+        """
+        GET commands for a device by UID.
+
+        :param device_uid: The UID of the device to retrieve
+        :return:
+        """
+        validate_uid(device_uid)
+        url = self._generate_url(
+            "device_commands_by_uid", PATH_MAP, device_uid=device_uid
         )
         return self.make_get_request(url, params=filters)
 
