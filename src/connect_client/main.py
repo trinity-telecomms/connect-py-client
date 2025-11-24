@@ -1,6 +1,7 @@
 from .modules.auth import AuthAPI
 from .modules.devices import DevicesAPI
 from .modules.orgs import OrgsAPI
+from .modules.sims import SimsAPI
 
 
 class ConnectClient:
@@ -14,3 +15,4 @@ class ConnectClient:
         self.auth = AuthAPI(self)
         self.devices = DevicesAPI(self)
         self.orgs = OrgsAPI(self)
+        self.sims = SimsAPI(self)

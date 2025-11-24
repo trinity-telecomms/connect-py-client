@@ -8,6 +8,11 @@ def validate_uid(u):
         raise ValueError("UID must be a non-empty string")
 
 
+def validate_msisdn(m):
+    if not isinstance(m, str) or not m.strip():
+        raise ValueError("MSISDN must be a non-empty string")
+
+
 def validate_command(command):
     if not isinstance(command, dict):
         raise ValueError("Command must be a dictionary")
