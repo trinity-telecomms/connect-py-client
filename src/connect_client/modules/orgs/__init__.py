@@ -3,7 +3,6 @@ from typing import Dict, List, Any, Union
 from connect_client.decorators import handle_exceptions
 from connect_client.mixins import ResourceMixin
 from connect_client.validators import validate_id
-from .constants import PATH_MAP
 
 
 class OrgsAPI(ResourceMixin):
@@ -16,7 +15,7 @@ class OrgsAPI(ResourceMixin):
         :return: A Company object as dictionary or error response
         """
         validate_id(company_id)
-        url = self._generate_url("company_by_id", PATH_MAP, company_id=company_id)
+        url = self._url(f"orgs/company/{company_id}/")
         return self.make_get_request(url)
 
     @handle_exceptions
@@ -31,7 +30,7 @@ class OrgsAPI(ResourceMixin):
         :return: List of folder objects as dictionaries or error response
         """
         validate_id(folder_id)
-        url = self._generate_url("folder_by_id", PATH_MAP, folder_id=folder_id)
+        url = self._url(f"orgs/folder/{folder_id}/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
@@ -46,5 +45,5 @@ class OrgsAPI(ResourceMixin):
         :return: List of folder objects as dictionaries or error response
         """
         validate_id(company_id)
-        url = self._generate_url("company_folders", PATH_MAP, company_id=company_id)
+        url = self._url(f"orgs/folders/company/{company_id}/")
         return self.make_get_request(url, params=filters)
