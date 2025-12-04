@@ -206,6 +206,26 @@ uv run pytest --cov=connect_client
 uv run pytest tests/modules/devices/test_devices_api.py
 ```
 
+### Building the Package
+
+This project uses the `uv_build` backend for building distributions:
+
+```bash
+# Build both wheel and source distribution
+uv build
+
+# Build only wheel
+uv build --wheel
+
+# Build only source distribution
+uv build --sdist
+
+# Build to a specific directory
+uv build --out-dir dist/
+```
+
+The built distributions will be available in the `dist/` directory.
+
 ## Contributing
 
 1. Fork the repository
