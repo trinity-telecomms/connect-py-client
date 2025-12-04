@@ -16,7 +16,6 @@ class TestOrgsAPI:
         """Test OrgsAPI initialization"""
         orgs_api = OrgsAPI(mock_client)
         assert orgs_api.client == mock_client
-        assert orgs_api._cache == mock_client.cache
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_success(
@@ -206,18 +205,14 @@ class TestOrgsAPI:
         mock_request.return_value = {"id": 1}
         orgs_api = OrgsAPI(mock_client)
 
-        from connect_client.modules.orgs.constants import PATH_MAP
-
-        with patch.object(orgs_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(orgs_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/orgs/company/1/"
             )
 
             orgs_api.get(1)
 
-            mock_generate.assert_called_once_with(
-                "company_by_id", PATH_MAP, company_id=1
-            )
+            mock_url.assert_called_once_with("orgs/company/1/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_success(
@@ -329,11 +324,9 @@ class TestOrgsAPI:
         mock_request.return_value = {"id": 1}
         orgs_api = OrgsAPI(mock_client)
 
-        from connect_client.modules.orgs.constants import PATH_MAP
-
-        with patch.object(orgs_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = "https://api.example.com/api/v4/orgs/folder/1/"
+        with patch.object(orgs_api, "_url") as mock_url:
+            mock_url.return_value = "https://api.example.com/api/v4/orgs/folder/1/"
 
             orgs_api.get_folder(1)
 
-            mock_generate.assert_called_once_with("folder_by_id", PATH_MAP, folder_id=1)
+            mock_url.assert_called_once_with("orgs/folder/1/")
