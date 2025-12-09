@@ -13,10 +13,9 @@ class TestDevicesAPI:
     """Test suite for DevicesAPI class"""
 
     def test_init(self, mock_client):
-        """Test DevicesAPI initialization"""
+        """Test DevicesAPI initialisation"""
         devices_api = DevicesAPI(mock_client)
         assert devices_api.client == mock_client
-        assert devices_api._cache == mock_client.cache
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_success(self, mock_request, mock_client, mock_device_response):
@@ -185,14 +184,12 @@ class TestDevicesAPI:
         mock_request.return_value = {"id": 1}
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = "https://api.example.com/api/v4/devices/1/"
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = "https://api.example.com/api/v4/devices/1/"
 
             devices_api.get(1)
 
-            mock_generate.assert_called_once_with("device_by_id", PATH_MAP, device_id=1)
+            mock_url.assert_called_once_with("devices/1/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_url_generation_by_uid(self, mock_request, mock_client):
@@ -200,18 +197,14 @@ class TestDevicesAPI:
         mock_request.return_value = {"id": 1}
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/devices/uid/test-uid-123/"
             )
 
             devices_api.get_by_uid("test-uid-123")
 
-            mock_generate.assert_called_once_with(
-                "device_by_uid", PATH_MAP, device_uid="test-uid-123"
-            )
+            mock_url.assert_called_once_with("devices/uid/test-uid-123/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_latest_data_by_uid_success(
@@ -277,18 +270,14 @@ class TestDevicesAPI:
         mock_request.return_value = {"data": "latest"}
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/devices/uid/test-uid-123/data/latest/"
             )
 
             devices_api.get_latest_data_by_uid("test-uid-123")
 
-            mock_generate.assert_called_once_with(
-                "device_latest_data", PATH_MAP, device_uid="test-uid-123"
-            )
+            mock_url.assert_called_once_with("devices/uid/test-uid-123/data/latest/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_url_generation_events(self, mock_request, mock_client):
@@ -296,18 +285,14 @@ class TestDevicesAPI:
         mock_request.return_value = {"events": []}
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
-                "https://api.example.com/api/v4/devices/uid/test-uid-123/data/events/"
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
+                "https://api.example.com/api/v4/devices/uid/test-uid-123/events/"
             )
 
             devices_api.get_events_by_uid("test-uid-123")
 
-            mock_generate.assert_called_once_with(
-                "device_events_by_uid", PATH_MAP, device_uid="test-uid-123"
-            )
+            mock_url.assert_called_once_with("devices/uid/test-uid-123/events/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_commands_by_uid_success(
@@ -406,18 +391,14 @@ class TestDevicesAPI:
         mock_request.return_value = {"commands": []}
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/devices/uid/test-uid-123/commands/"
             )
 
             devices_api.get_commands_by_uid("test-uid-123")
 
-            mock_generate.assert_called_once_with(
-                "device_commands_by_uid", PATH_MAP, device_uid="test-uid-123"
-            )
+            mock_url.assert_called_once_with("devices/uid/test-uid-123/commands/")
 
     @patch("connect_client.mixins.ResourceMixin.make_patch_request")
     def test_move_to_folder_success(self, mock_request, mock_client):
@@ -762,18 +743,14 @@ class TestDevicesAPI:
         mock_request.return_value = []
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/devices/folder/5/"
             )
 
             devices_api.list_by_folder(5)
 
-            mock_generate.assert_called_once_with(
-                "list_by_folder", PATH_MAP, folder_id=5
-            )
+            mock_url.assert_called_once_with("devices/folder/5/")
 
     @patch("connect_client.mixins.ResourceMixin.make_get_request")
     def test_list_by_folder_lite_success(self, mock_request, mock_client):
@@ -885,15 +862,11 @@ class TestDevicesAPI:
         mock_request.return_value = []
         devices_api = DevicesAPI(mock_client)
 
-        from connect_client.modules.devices.constants import PATH_MAP
-
-        with patch.object(devices_api, "_generate_url") as mock_generate:
-            mock_generate.return_value = (
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
                 "https://api.example.com/api/v4/devices/folder/5/lite/"
             )
 
             devices_api.list_by_folder_lite(5)
 
-            mock_generate.assert_called_once_with(
-                "list_by_folder_lite", PATH_MAP, folder_id=5
-            )
+            mock_url.assert_called_once_with("devices/folder/5/lite/")

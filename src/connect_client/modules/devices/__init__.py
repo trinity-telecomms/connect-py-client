@@ -3,7 +3,6 @@ from typing import Dict, Any
 from connect_client.decorators import handle_exceptions
 from connect_client.mixins import ResourceMixin
 from connect_client.validators import validate_id, validate_uid, validate_command
-from .constants import PATH_MAP
 
 
 class DevicesAPI(ResourceMixin):
@@ -17,7 +16,7 @@ class DevicesAPI(ResourceMixin):
         :raises ValueError: If device_id is not a positive integer
         """
         validate_id(device_id)
-        url = self._generate_url("device_by_id", PATH_MAP, device_id=device_id)
+        url = self._url(f"devices/{device_id}/")
         return self.make_get_request(url)
 
     @handle_exceptions
@@ -30,7 +29,7 @@ class DevicesAPI(ResourceMixin):
         :raises ValueError: If device_uid is not a valid string
         """
         validate_uid(device_uid)
-        url = self._generate_url("device_by_uid", PATH_MAP, device_uid=device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
         return self.make_get_request(url)
 
     @handle_exceptions
@@ -42,7 +41,7 @@ class DevicesAPI(ResourceMixin):
         :return: A Device object as dictionary or error response
         """
         validate_uid(device_uid)
-        url = self._generate_url("device_latest_data", PATH_MAP, device_uid=device_uid)
+        url = self._url(f"devices/uid/{device_uid}/data/latest/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
@@ -56,14 +55,12 @@ class DevicesAPI(ResourceMixin):
         :return:
         """
         validate_uid(device_uid)
-        url = self._generate_url(
-            "device_events_by_uid", PATH_MAP, device_uid=device_uid
-        )
+        url = self._url(f"devices/uid/{device_uid}/events/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
     def get_commands_by_uid(
-            self, device_uid: str, **filters: str
+        self, device_uid: str, **filters: str
     ) -> list[dict[str, Any]]:
         """
         GET commands for a device by UID.
@@ -72,9 +69,7 @@ class DevicesAPI(ResourceMixin):
         :return:
         """
         validate_uid(device_uid)
-        url = self._generate_url(
-            "device_commands_by_uid", PATH_MAP, device_uid=device_uid
-        )
+        url = self._url(f"devices/uid/{device_uid}/commands/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
@@ -87,7 +82,7 @@ class DevicesAPI(ResourceMixin):
         :return:
         """
         validate_id(folder_id)
-        url = self._generate_url("list_by_folder", PATH_MAP, folder_id=folder_id)
+        url = self._url(f"devices/folder/{folder_id}/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
@@ -102,7 +97,7 @@ class DevicesAPI(ResourceMixin):
         :return:
         """
         validate_id(folder_id)
-        url = self._generate_url("list_by_folder_lite", PATH_MAP, folder_id=folder_id)
+        url = self._url(f"devices/folder/{folder_id}/lite/")
         return self.make_get_request(url, params=filters)
 
     @handle_exceptions
@@ -117,7 +112,7 @@ class DevicesAPI(ResourceMixin):
         validate_id(device_id)
         validate_id(folder_id)
 
-        url = self._generate_url("device_by_id", PATH_MAP, device_id=device_id)
+        url = self._url(f"devices/{device_id}/")
         data = {
             "folder": folder_id,
         }
@@ -135,7 +130,7 @@ class DevicesAPI(ResourceMixin):
         validate_uid(device_uid)
         validate_id(folder_id)
 
-        url = self._generate_url("device_by_uid", PATH_MAP, device_uid=device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
         data = {
             "folder": folder_id,
         }
@@ -153,7 +148,7 @@ class DevicesAPI(ResourceMixin):
         validate_id(device_id)
         validate_id(target_state)
 
-        url = self._generate_url("device_by_id", PATH_MAP, device_id=device_id)
+        url = self._url(f"devices/{device_id}/")
         data = {
             "state": target_state,
         }
@@ -173,7 +168,7 @@ class DevicesAPI(ResourceMixin):
         validate_uid(device_uid)
         validate_id(target_state)
 
-        url = self._generate_url("device_by_uid", PATH_MAP, device_uid=device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
         data = {
             "state": target_state,
         }
@@ -190,7 +185,7 @@ class DevicesAPI(ResourceMixin):
         """
         validate_id(device_id)
         validate_command(command)
-        url = self._generate_url("issue_command", PATH_MAP, device_id=device_id)
+        url = self._url(f"devices/{device_id}/command/send/")
         data = {
             **command,
         }
@@ -207,9 +202,7 @@ class DevicesAPI(ResourceMixin):
         """
         validate_uid(device_uid)
         validate_command(command)
-        url = self._generate_url(
-            "issue_command_by_uid", PATH_MAP, device_uid=device_uid
-        )
+        url = self._url(f"devices/uid/{device_uid}/command/send/")
         data = {
             **command,
         }

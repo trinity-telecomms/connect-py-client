@@ -7,19 +7,19 @@ A Python client library for interacting with the Trinity IoT Connect API.
 Using `uv`:
 
 ```bash
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
 ```
 
 Using `pip` with `uv`:
 
 ```bash
-uv pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
+uv pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
 ```
 
 Using `pip`:
 
 ```bash
-pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.1.8
+pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
 ```
 
 ## Quick Start
@@ -29,11 +29,8 @@ from connect_client import ConnectClient
 
 # Initialise the client
 client = ConnectClient(
-    base_url="https://your-connect-api.com",
-    credentials={
-        "email": "your-email@example.com",
-        "password": "your-password"
-    }
+    base_url="https://capi.trintel.co.za",
+    token="your-service-account-token"
 )
 
 # Get a device by ID
@@ -88,13 +85,9 @@ client.devices.move_to_folder(-1, 5)  # Device ID must be positive
 
 ```python
 client = ConnectClient(
-    base_url="https://api.connect.com",  # Required: API base URL
+    base_url="https://capi.trintel.co.za",  # Required: API base URL
     api_version="v4",  # Optional: API version (default: v4)
-    credentials={  # Required for authentication
-        "email": "user@example.com",
-        "password": "password"
-    },
-    cache=cache_instance  # Optional: Cache implementation
+    token="your-service-account-token"  # Required: Service account token
 )
 ```
 
@@ -102,7 +95,7 @@ client = ConnectClient(
 
 ## Version Information
 
-Current version: **0.1.8**
+Current version: **0.2.0**
 
 For more information, visit
 the [GitHub repository](https://github.com/trinity-telecomms/connect-py-client).
