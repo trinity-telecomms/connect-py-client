@@ -10,10 +10,10 @@ from connect_client.exceptions import (
 
 
 class TestOrgsAPI:
-    """Test suite for OrgsAPI class with updated pattern"""
+    """Test suite for OrgsAPI class"""
 
     def test_init(self, mock_client):
-        """Test OrgsAPI initialization"""
+        """Test OrgsAPI initialisation"""
         orgs_api = OrgsAPI(mock_client)
         assert orgs_api.client == mock_client
 

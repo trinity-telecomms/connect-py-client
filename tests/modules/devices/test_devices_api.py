@@ -13,7 +13,7 @@ class TestDevicesAPI:
     """Test suite for DevicesAPI class"""
 
     def test_init(self, mock_client):
-        """Test DevicesAPI initialization"""
+        """Test DevicesAPI initialisation"""
         devices_api = DevicesAPI(mock_client)
         assert devices_api.client == mock_client
 
