@@ -1,6 +1,6 @@
 import requests
 
-from connect_client.exceptions import (
+from trinity_connect_client.exceptions import (
     ConnectAPIError,
     ResourceNotFoundError,
     UnauthorisedError,

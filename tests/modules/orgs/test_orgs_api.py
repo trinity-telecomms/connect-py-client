@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import patch
 
-from connect_client.modules.orgs import OrgsAPI
-from connect_client.exceptions import (
+from trinity_connect_client.modules.orgs import OrgsAPI
+from trinity_connect_client.exceptions import (
     ConnectAPIError,
     ResourceNotFoundError,
     UnauthorisedError,
@@ -17,7 +17,7 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
         assert orgs_api.client == mock_client
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_success(
         self, mock_request, mock_client, mock_company_response
     ):
@@ -51,7 +51,7 @@ class TestOrgsAPI:
         with pytest.raises(ValueError, match="ID must be a positive integer"):
             orgs_api.get(-1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_not_found(self, mock_request, mock_client):
         """Test get_company when company not found"""
         mock_request.side_effect = ResourceNotFoundError("Requested resource not found")
@@ -60,7 +60,7 @@ class TestOrgsAPI:
         with pytest.raises(ResourceNotFoundError, match="Requested resource not found"):
             orgs_api.get(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_unauthorised(self, mock_request, mock_client):
         """Test get_company when access unauthorised"""
         mock_request.side_effect = UnauthorisedError("Request not authorised")
@@ -69,7 +69,7 @@ class TestOrgsAPI:
         with pytest.raises(UnauthorisedError, match="Request not authorised"):
             orgs_api.get(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_forbidden(self, mock_request, mock_client):
         """Test get_company when access forbidden"""
         mock_request.side_effect = PermissionError(
@@ -82,7 +82,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_server_error(self, mock_request, mock_client):
         """Test get_company with server error"""
         mock_request.side_effect = ConnectAPIError(
@@ -95,7 +95,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_success(
         self, mock_request, mock_client, mock_company_folders_response
     ):
@@ -108,7 +108,7 @@ class TestOrgsAPI:
         assert result == mock_company_folders_response
         mock_request.assert_called_once()
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_with_filters(
         self, mock_request, mock_client, mock_company_folders_response
     ):
@@ -146,7 +146,7 @@ class TestOrgsAPI:
         with pytest.raises(ValueError, match="ID must be a positive integer"):
             orgs_api.get_folders(-1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_not_found(self, mock_request, mock_client):
         """Test get_company_folders when company not found"""
         mock_request.side_effect = ResourceNotFoundError("Not found")
@@ -155,7 +155,7 @@ class TestOrgsAPI:
         with pytest.raises(ResourceNotFoundError, match="Not found"):
             orgs_api.get_folders(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_unauthorised(self, mock_request, mock_client):
         """Test get_company_folders when access unauthorised"""
         mock_request.side_effect = UnauthorisedError("Request not authorised")
@@ -164,7 +164,7 @@ class TestOrgsAPI:
         with pytest.raises(UnauthorisedError, match="Request not authorised"):
             orgs_api.get_folders(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_forbidden(self, mock_request, mock_client):
         """Test get_company_folders when access forbidden"""
         mock_request.side_effect = PermissionError(
@@ -177,7 +177,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get_folders(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_server_error(self, mock_request, mock_client):
         """Test get_company_folders with server error"""
         mock_request.side_effect = ConnectAPIError("ERR")
@@ -186,7 +186,7 @@ class TestOrgsAPI:
         with pytest.raises(ConnectAPIError, match="ERR"):
             orgs_api.get_folders(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_company_folders_unexpected_exception(self, mock_request, mock_client):
         """Test get_company_folders with unexpected exception"""
         mock_request.side_effect = ConnectAPIError(
@@ -199,7 +199,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get_folders(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_url_generation(self, mock_request, mock_client):
         """Test URL generation for endpoints"""
         mock_request.return_value = {"id": 1}
@@ -214,7 +214,7 @@ class TestOrgsAPI:
 
             mock_url.assert_called_once_with("orgs/company/1/")
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_success(
         self, mock_request, mock_client, mock_company_folders_response
     ):
@@ -227,7 +227,7 @@ class TestOrgsAPI:
         assert result == mock_company_folders_response
         mock_request.assert_called_once()
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_with_filters(
         self, mock_request, mock_client, mock_company_folders_response
     ):
@@ -265,7 +265,7 @@ class TestOrgsAPI:
         with pytest.raises(ValueError, match="ID must be a positive integer"):
             orgs_api.get_folder(-1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_not_found(self, mock_request, mock_client):
         """Test get_folder when folder not found"""
         mock_request.side_effect = ResourceNotFoundError("Not found")
@@ -274,7 +274,7 @@ class TestOrgsAPI:
         with pytest.raises(ResourceNotFoundError, match="Not found"):
             orgs_api.get_folder(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_unauthorised(self, mock_request, mock_client):
         """Test get_folder when access unauthorised"""
         mock_request.side_effect = UnauthorisedError("Request not authorised")
@@ -283,7 +283,7 @@ class TestOrgsAPI:
         with pytest.raises(UnauthorisedError, match="Request not authorised"):
             orgs_api.get_folder(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_forbidden(self, mock_request, mock_client):
         """Test get_folder when access forbidden"""
         mock_request.side_effect = PermissionError(
@@ -296,7 +296,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get_folder(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_server_error(self, mock_request, mock_client):
         """Test get_folder with server error"""
         mock_request.side_effect = ConnectAPIError("ERR")
@@ -305,7 +305,7 @@ class TestOrgsAPI:
         with pytest.raises(ConnectAPIError, match="ERR"):
             orgs_api.get_folder(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_unexpected_exception(self, mock_request, mock_client):
         """Test get_folder with unexpected exception"""
         mock_request.side_effect = ConnectAPIError(
@@ -318,7 +318,7 @@ class TestOrgsAPI:
         ):
             orgs_api.get_folder(1)
 
-    @patch("connect_client.mixins.ResourceMixin.make_get_request")
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_get_folder_url_generation(self, mock_request, mock_client):
         """Test URL generation for folder endpoint"""
         mock_request.return_value = {"id": 1}

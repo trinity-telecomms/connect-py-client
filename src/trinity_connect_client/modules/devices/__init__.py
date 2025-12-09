@@ -1,8 +1,8 @@
 from typing import Dict, Any
 
-from connect_client.decorators import handle_exceptions
-from connect_client.mixins import ResourceMixin
-from connect_client.validators import validate_id, validate_uid, validate_command
+from trinity_connect_client.decorators import handle_exceptions
+from trinity_connect_client.mixins import ResourceMixin
+from trinity_connect_client.validators import validate_id, validate_uid, validate_command
 
 
 class DevicesAPI(ResourceMixin):

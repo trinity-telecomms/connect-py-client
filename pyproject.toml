@@ -1,7 +1,7 @@
 [project]
-name = "connect-client"
+name = "trinity-connect-client"
 version = "0.2.0"
-description = "Official Python library for Connect API interactions"
+description = "Official Python library for Trinity IoT Connect API interactions"
 readme = "README.md"
 authors = [
     { name = "Jan Badenhorst", email = "jan.badenhorst@trintel.co.za" },
@@ -18,8 +18,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/trinity-telecomms/connect-client"
-Issues = "https://github.com/trinity-telecomms/connect-client/issues"
+Homepage = "https://github.com/trinity-telecomms/connect-py-client"
+Issues = "https://github.com/trinity-telecomms/connect-py-client/issues"
 
 [build-system]
 requires = ["uv_build >= 0.7.19, <0.9.0"]

@@ -1,5 +1,5 @@
 import pytest
-from connect_client import ConnectClient
+from trinity_connect_client import ConnectClient
 
 
 @pytest.fixture

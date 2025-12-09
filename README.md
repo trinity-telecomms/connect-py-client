@@ -22,20 +22,26 @@ with comprehensive error handling, type hints, and good test coverage.
 ### Using uv (recommended)
 
 ```bash
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
+uv add trinity-connect-client
 ```
 
 ### Using pip
 
 ```bash
-pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
+pip install trinity-connect-client
+```
+
+### From source
+
+```bash
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
 ```
 
 ## Quick Start
 
 ```python
-from connect_client import ConnectClient
-from connect_client.exceptions import ResourceNotFoundError, UnauthorisedError
+from trinity_connect_client import ConnectClient
+from trinity_connect_client.exceptions import ResourceNotFoundError, UnauthorisedError
 
 # Initialize the client
 client = ConnectClient(
@@ -59,7 +65,7 @@ except UnauthorisedError:
 The library provides type-safe dataclass models for API responses:
 
 ```python
-from connect_client import ConnectClient, Device, Company, Folder
+from trinity_connect_client import ConnectClient, Device, Company, Folder
 
 client = ConnectClient(
     api_version="v4",
@@ -105,7 +111,7 @@ export CONNECT_API_BASE_URL="https://capi.trintel.co.za"
 
 ```python
 import os
-from connect_client import ConnectClient
+from trinity_connect_client import ConnectClient
 
 client = ConnectClient(
     api_version="v4",
@@ -154,7 +160,7 @@ Contact your Trinity IoT administrator to generate a service account token for y
 The library raises specific exceptions for different error conditions:
 
 ```python
-from connect_client.exceptions import (
+from trinity_connect_client.exceptions import (
     ResourceNotFoundError,
     UnauthorisedError,
     ConnectAPIError
