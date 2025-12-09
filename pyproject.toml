@@ -35,3 +35,9 @@ test = [
     "pytest-mock>=3.12.0",
     "responses>=0.24.0",
 ]
+
+[tool.coverage.run]
+data_file = ".coverage/.coverage"
+
+[tool.coverage.html]
+directory = ".coverage"
