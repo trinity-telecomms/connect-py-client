@@ -1,4 +1,4 @@
-from connect_client.exceptions import UnauthorisedError, ResourceNotFoundError
+from trinity_connect_client.exceptions import UnauthorisedError, ResourceNotFoundError
 
 
 def handle_exceptions(func):

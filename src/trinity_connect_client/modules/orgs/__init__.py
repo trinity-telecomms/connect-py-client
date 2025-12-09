@@ -1,8 +1,8 @@
 from typing import Dict, List, Any, Union
 
-from connect_client.decorators import handle_exceptions
-from connect_client.mixins import ResourceMixin
-from connect_client.validators import validate_id
+from trinity_connect_client.decorators import handle_exceptions
+from trinity_connect_client.mixins import ResourceMixin
+from trinity_connect_client.validators import validate_id
 
 
 class OrgsAPI(ResourceMixin):

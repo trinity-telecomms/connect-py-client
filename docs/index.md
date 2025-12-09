@@ -25,7 +25,7 @@ pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
 ## Quick Start
 
 ```python
-from connect_client import ConnectClient
+from trinity_connect_client import ConnectClient
 
 # Initialise the client
 client = ConnectClient(
@@ -48,7 +48,7 @@ The library includes comprehensive error handling with specific exception types.
 ### Exception Types
 
 ```python
-from connect_client.exceptions import (
+from trinity_connect_client.exceptions import (
     ConnectAPIError,
     ResourceNotFoundError,
     UnauthorisedError
