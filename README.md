@@ -19,22 +19,44 @@ with comprehensive error handling, type hints, and good test coverage.
 
 ## Installation
 
-### Using uv (recommended)
+### From PyPI (Recommended)
+
+The library is available on PyPI and can be installed using your preferred package manager:
+
+#### Using uv (recommended)
 
 ```bash
 uv add trinity-connect-client
 ```
 
-### Using pip
+#### Using pip
 
 ```bash
 pip install trinity-connect-client
 ```
 
-### From source
+### From GitHub
+
+You can also install directly from the GitHub repository:
+
+#### Using uv
 
 ```bash
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.0
+# Install latest release
+uv add git+https://github.com/trinity-telecomms/connect-py-client
+
+# Install specific version
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.1
+```
+
+#### Using pip
+
+```bash
+# Install latest release
+pip install git+https://github.com/trinity-telecomms/connect-py-client
+
+# Install specific version
+pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.1
 ```
 
 ## Quick Start
@@ -206,7 +228,7 @@ uv run ruff check .
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=connect_client
+uv run pytest --cov=trinity_connect_client
 
 # Run specific test file
 uv run pytest tests/modules/devices/test_devices_api.py
