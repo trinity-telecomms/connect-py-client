@@ -177,6 +177,48 @@ client = ConnectClient(
 **How to get a service account token:**
 Contact your Trinity IoT administrator to generate a service account token for your application.
 
+## Device Commands
+
+The library supports two types of commands for devices:
+
+### Issue Custom Commands
+
+Send custom RPC commands directly to devices:
+
+```python
+# Issue a custom command to a device by UID
+command = {
+    "rpc": "reboot",
+    "args": ["force"],
+    "pid": "0",
+    "ttl": 300,
+    "qos": 0
+}
+response = client.devices.issue_command_by_uid("device-uid-123", command)
+```
+
+### Issue Stored Commands
+
+Issue pre-configured stored commands (automation scripts) by their numeric code:
+
+```python
+# Issue a stored command with default parameters
+response = client.devices.issue_stored_command_by_uid(
+    device_uid="device-uid-123",
+    command_code=240  # Stored command code
+)
+
+# Issue a stored command with custom parameters
+response = client.devices.issue_stored_command_by_uid(
+    device_uid="device-uid-123",
+    command_code=248,
+    ttl=120,  # Time-to-live in seconds (default: 60)
+    pid="123"  # Process ID (default: "0")
+)
+```
+
+Stored commands are pre-configured automation scripts in Connect, referenced by their numeric code (e.g., 240, 248) rather than direct device-level RPCs.
+
 ## Error Handling
 
 The library raises specific exceptions for different error conditions:

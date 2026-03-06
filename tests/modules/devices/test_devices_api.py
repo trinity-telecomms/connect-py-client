@@ -635,6 +635,150 @@ class TestDevicesAPI:
         _, kwargs = mock_request.call_args
         assert kwargs["json"] == command
 
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_success(self, mock_request, mock_client):
+        """Test successful stored command issue by UID"""
+        mock_request.return_value = {"status": "sent"}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+        assert result == {"status": "sent"}
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_with_custom_params(
+        self, mock_request, mock_client
+    ):
+        """Test stored command issue with custom ttl and pid"""
+        mock_request.return_value = {"status": "sent"}
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.issue_stored_command_by_uid(
+            "test-uid-123", 248, ttl=120, pid="123"
+        )
+
+        assert result == {"status": "sent"}
+        mock_request.assert_called_once()
+
+    def test_issue_stored_command_by_uid_invalid_uid(self, mock_client):
+        """Test issue_stored_command_by_uid with invalid UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.issue_stored_command_by_uid("", 240)
+
+    def test_issue_stored_command_by_uid_invalid_uid_whitespace(self, mock_client):
+        """Test issue_stored_command_by_uid with whitespace UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.issue_stored_command_by_uid("   ", 240)
+
+    def test_issue_stored_command_by_uid_invalid_command_code_type(self, mock_client):
+        """Test issue_stored_command_by_uid with invalid command code type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", "invalid")
+
+    def test_issue_stored_command_by_uid_invalid_command_code_zero(self, mock_client):
+        """Test issue_stored_command_by_uid with zero command code"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", 0)
+
+    def test_issue_stored_command_by_uid_invalid_command_code_negative(
+        self, mock_client
+    ):
+        """Test issue_stored_command_by_uid with negative command code"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", -1)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_not_found(self, mock_request, mock_client):
+        """Test issue_stored_command_by_uid when device not found"""
+        mock_request.side_effect = ResourceNotFoundError("Not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Not found"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_unauthorised(self, mock_request, mock_client):
+        """Test issue_stored_command_by_uid when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Request not authorised")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Request not authorised"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_forbidden(self, mock_request, mock_client):
+        """Test issue_stored_command_by_uid when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(
+            PermissionError, match="You are not authorised to access this resource"
+        ):
+            devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_server_error(self, mock_request, mock_client):
+        """Test issue_stored_command_by_uid with server error"""
+        mock_request.side_effect = ConnectAPIError("ERR")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="ERR"):
+            devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_url_generation(
+        self, mock_request, mock_client
+    ):
+        """Test URL generation for issue_stored_command_by_uid endpoint"""
+        mock_request.return_value = {"status": "sent"}
+        devices_api = DevicesAPI(mock_client)
+
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = "https://api.example.com/api/v4/devices/uid/test-uid-123/command/240/issue/"
+
+            devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+            mock_url.assert_called_once_with(
+                "devices/uid/test-uid-123/command/240/issue/"
+            )
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_data_structure(
+        self, mock_request, mock_client
+    ):
+        """Test issue_stored_command_by_uid sends correct data structure"""
+        devices_api = DevicesAPI(mock_client)
+
+        devices_api.issue_stored_command_by_uid("test-uid-123", 240, ttl=120, pid="456")
+
+        _, kwargs = mock_request.call_args
+        assert kwargs["json"] == {"ttl": 120, "pid": "456"}
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_issue_stored_command_by_uid_default_params(
+        self, mock_request, mock_client
+    ):
+        """Test issue_stored_command_by_uid with default ttl and pid"""
+        devices_api = DevicesAPI(mock_client)
+
+        devices_api.issue_stored_command_by_uid("test-uid-123", 240)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs["json"] == {"ttl": 60, "pid": "0"}
+
     @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_list_by_folder_success(self, mock_request, mock_client):
         """Test successful device list retrieval by folder ID"""
@@ -744,9 +888,7 @@ class TestDevicesAPI:
         devices_api = DevicesAPI(mock_client)
 
         with patch.object(devices_api, "_url") as mock_url:
-            mock_url.return_value = (
-                "https://api.example.com/api/v4/devices/folder/5/"
-            )
+            mock_url.return_value = "https://api.example.com/api/v4/devices/folder/5/"
 
             devices_api.list_by_folder(5)
 
