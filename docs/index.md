@@ -55,6 +55,51 @@ client = ConnectClient(
 device = client.devices.get(device_id=123)
 ```
 
+---
+
+## Device Commands
+
+The library supports sending commands to devices:
+
+### Custom Commands
+
+Send custom RPC commands directly:
+
+```python
+command = {
+    "rpc": "reboot",
+    "args": ["force"],
+    "pid": "0",
+    "ttl": 300,
+    "qos": 0
+}
+response = client.devices.issue_command_by_uid("device-uid-123", command)
+```
+
+### Stored Commands
+
+Issue pre-configured stored commands by their numeric code:
+
+```python
+# With default parameters (ttl=60, pid="0")
+response = client.devices.issue_stored_command_by_uid(
+    device_uid="device-uid-123",
+    command_code=240
+)
+
+# With custom parameters
+response = client.devices.issue_stored_command_by_uid(
+    device_uid="device-uid-123",
+    command_code=248,
+    ttl=120,
+    pid="123"
+)
+```
+
+Stored commands are pre-configured automation scripts in Connect, referenced by numeric codes (e.g., 240, 248).
+
+---
+
 ### Additional Resources
 
 - [Error Handling](#error-handling)
@@ -113,7 +158,7 @@ client = ConnectClient(
 
 ## Version Information
 
-Current version: **0.2.1**
+Current version: **0.3.0**
 
 For more information, visit
 the [GitHub repository](https://github.com/trinity-telecomms/connect-py-client).
