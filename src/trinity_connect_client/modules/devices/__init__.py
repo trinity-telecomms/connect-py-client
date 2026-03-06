@@ -2,7 +2,11 @@ from typing import Dict, Any
 
 from trinity_connect_client.decorators import handle_exceptions
 from trinity_connect_client.mixins import ResourceMixin
-from trinity_connect_client.validators import validate_id, validate_uid, validate_command
+from trinity_connect_client.validators import (
+    validate_id,
+    validate_uid,
+    validate_command,
+)
 
 
 class DevicesAPI(ResourceMixin):
@@ -206,4 +210,26 @@ class DevicesAPI(ResourceMixin):
         data = {
             **command,
         }
+        return self.make_post_request(url, json=data)
+
+    @handle_exceptions
+    def issue_stored_command_by_uid(
+        self, device_uid: str, command_code: int, ttl: int = 60, pid: str = "0"
+    ) -> dict[str, Any]:
+        """
+        Issue a pre-configured stored command to a device by UID.
+
+        Stored commands are pre-configured automation scripts in Connect,
+        referenced by their numeric code — not direct device-level RPCs.
+
+        :param device_uid: The UID of the device
+        :param command_code: The numeric stored command code (e.g., 240, 248)
+        :param ttl: Command time-to-live in seconds
+        :param pid: Process ID
+        :return: API response as dictionary
+        """
+        validate_uid(device_uid)
+        validate_id(command_code)
+        url = self._url(f"devices/uid/{device_uid}/command/{command_code}/issue/")
+        data = {"ttl": ttl, "pid": pid}
         return self.make_post_request(url, json=data)
