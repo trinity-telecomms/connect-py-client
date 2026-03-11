@@ -81,18 +81,10 @@ response = client.devices.issue_command_by_uid("device-uid-123", command)
 Issue pre-configured stored commands by their numeric code:
 
 ```python
-# With default parameters (ttl=60, pid="0")
+# Issue a stored command
 response = client.devices.issue_stored_command_by_uid(
     device_uid="device-uid-123",
     command_code=240
-)
-
-# With custom parameters
-response = client.devices.issue_stored_command_by_uid(
-    device_uid="device-uid-123",
-    command_code=248,
-    ttl=120,
-    pid="123"
 )
 ```
 

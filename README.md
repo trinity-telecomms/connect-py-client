@@ -202,18 +202,10 @@ response = client.devices.issue_command_by_uid("device-uid-123", command)
 Issue pre-configured stored commands (automation scripts) by their numeric code:
 
 ```python
-# Issue a stored command with default parameters
+# Issue a stored command
 response = client.devices.issue_stored_command_by_uid(
     device_uid="device-uid-123",
     command_code=240  # Stored command code
-)
-
-# Issue a stored command with custom parameters
-response = client.devices.issue_stored_command_by_uid(
-    device_uid="device-uid-123",
-    command_code=248,
-    ttl=120,  # Time-to-live in seconds (default: 60)
-    pid="123"  # Process ID (default: "0")
 )
 ```
 

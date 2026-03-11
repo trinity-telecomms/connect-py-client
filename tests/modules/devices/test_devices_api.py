@@ -646,21 +646,6 @@ class TestDevicesAPI:
         assert result == {"status": "sent"}
         mock_request.assert_called_once()
 
-    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
-    def test_issue_stored_command_by_uid_with_custom_params(
-        self, mock_request, mock_client
-    ):
-        """Test stored command issue with custom ttl and pid"""
-        mock_request.return_value = {"status": "sent"}
-        devices_api = DevicesAPI(mock_client)
-
-        result = devices_api.issue_stored_command_by_uid(
-            "test-uid-123", 248, ttl=120, pid="123"
-        )
-
-        assert result == {"status": "sent"}
-        mock_request.assert_called_once()
-
     def test_issue_stored_command_by_uid_invalid_uid(self, mock_client):
         """Test issue_stored_command_by_uid with invalid UID"""
         devices_api = DevicesAPI(mock_client)
@@ -747,12 +732,12 @@ class TestDevicesAPI:
         devices_api = DevicesAPI(mock_client)
 
         with patch.object(devices_api, "_url") as mock_url:
-            mock_url.return_value = "https://api.example.com/api/v4/devices/uid/test-uid-123/command/240/issue/"
+            mock_url.return_value = "https://api.example.com/api/v4/devices/uid/test-uid-123/command/send/stored/"
 
             devices_api.issue_stored_command_by_uid("test-uid-123", 240)
 
             mock_url.assert_called_once_with(
-                "devices/uid/test-uid-123/command/240/issue/"
+                "devices/uid/test-uid-123/command/send/stored/"
             )
 
     @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
@@ -762,22 +747,10 @@ class TestDevicesAPI:
         """Test issue_stored_command_by_uid sends correct data structure"""
         devices_api = DevicesAPI(mock_client)
 
-        devices_api.issue_stored_command_by_uid("test-uid-123", 240, ttl=120, pid="456")
-
-        _, kwargs = mock_request.call_args
-        assert kwargs["json"] == {"ttl": 120, "pid": "456"}
-
-    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
-    def test_issue_stored_command_by_uid_default_params(
-        self, mock_request, mock_client
-    ):
-        """Test issue_stored_command_by_uid with default ttl and pid"""
-        devices_api = DevicesAPI(mock_client)
-
         devices_api.issue_stored_command_by_uid("test-uid-123", 240)
 
         _, kwargs = mock_request.call_args
-        assert kwargs["json"] == {"ttl": 60, "pid": "0"}
+        assert kwargs["json"] == {"command": 240}
 
     @patch("trinity_connect_client.mixins.ResourceMixin.make_get_request")
     def test_list_by_folder_success(self, mock_request, mock_client):

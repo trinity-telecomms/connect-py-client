@@ -214,7 +214,7 @@ class DevicesAPI(ResourceMixin):
 
     @handle_exceptions
     def issue_stored_command_by_uid(
-        self, device_uid: str, command_code: int, ttl: int = 60, pid: str = "0"
+        self, device_uid: str, command_code: int
     ) -> dict[str, Any]:
         """
         Issue a pre-configured stored command to a device by UID.
@@ -224,12 +224,10 @@ class DevicesAPI(ResourceMixin):
 
         :param device_uid: The UID of the device
         :param command_code: The numeric stored command code (e.g., 240, 248)
-        :param ttl: Command time-to-live in seconds
-        :param pid: Process ID
         :return: API response as dictionary
         """
         validate_uid(device_uid)
         validate_id(command_code)
-        url = self._url(f"devices/uid/{device_uid}/command/{command_code}/issue/")
-        data = {"ttl": ttl, "pid": pid}
+        url = self._url(f"devices/uid/{device_uid}/command/send/stored/")
+        data = {"command": command_code}
         return self.make_post_request(url, json=data)
