@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch
 
 from trinity_connect_client.modules.devices import DevicesAPI
+from trinity_connect_client.models.device import Device
 from trinity_connect_client.exceptions import (
     ConnectAPIError,
     ResourceNotFoundError,
@@ -985,3 +986,409 @@ class TestDevicesAPI:
             devices_api.list_by_folder_lite(5)
 
             mock_url.assert_called_once_with("devices/folder/5/lite/")
+
+    # ==================== Device Creation Tests ====================
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_success_minimal(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test successful device creation with minimal required fields"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 5, "uid": "123456789012345"}
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        assert result.id == 1
+        assert result.uid == "123456789012345"
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_success_with_alphanumeric_uid(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test successful device creation with alphanumeric UID"""
+        mock_created_device_response["uid"] = "ABC123456789XYZ"
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 5, "uid": "ABC123456789XYZ"}
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        assert result.id == 1
+        assert result.uid == "ABC123456789XYZ"
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_success_with_all_fields(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test successful device creation with all fields"""
+        mock_created_device_response["uid"] = "ABC123456789012XYZ"
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 5,
+            "uid": "ABC123456789012XYZ",
+            "name": "Test Device",
+            "description": "A test device",
+            "state": 50,
+            "imei": "123456789012345",
+            "serial_number": "SN12345",
+        }
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        assert result.id == 1
+        assert result.uid == "ABC123456789012XYZ"
+        mock_request.assert_called_once()
+
+    def test_create_missing_folder(self, mock_client):
+        """Test create with missing folder field"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"uid": "123456789012345"}
+
+        with pytest.raises(ValueError, match="Device creation requires 'folder' field"):
+            devices_api.create(device_data)
+
+    def test_create_missing_uid(self, mock_client):
+        """Test create with missing uid field"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1}
+
+        with pytest.raises(ValueError, match="Device creation requires 'uid' field"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_not_alphanumeric(self, mock_client):
+        """Test create with non-alphanumeric characters in uid"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "ABC-123-456-789"}
+
+        with pytest.raises(
+            ValueError, match="Device 'uid' must contain only alphanumeric characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_lowercase(self, mock_client):
+        """Test create with lowercase letters in uid"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "abc123456789xyz"}
+
+        with pytest.raises(
+            ValueError,
+            match="Device 'uid' must contain only uppercase letters and digits",
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_too_short(self, mock_client):
+        """Test create with uid too short"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "ABC12"}
+
+        with pytest.raises(
+            ValueError, match="Device 'uid' must be between 15 and 20 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_too_long(self, mock_client):
+        """Test create with uid too long"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "ABCDEFGHIJ1234567890XYZ"}
+
+        with pytest.raises(
+            ValueError, match="Device 'uid' must be between 15 and 20 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_empty(self, mock_client):
+        """Test create with empty uid"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": ""}
+
+        with pytest.raises(ValueError, match="Device 'uid' must be a non-empty string"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_whitespace(self, mock_client):
+        """Test create with whitespace-only uid"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "   "}
+
+        with pytest.raises(ValueError, match="Device 'uid' must be a non-empty string"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_uid_type(self, mock_client):
+        """Test create with non-string uid"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": 123456789012345}
+
+        with pytest.raises(ValueError, match="Device 'uid' must be a string"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_folder_type(self, mock_client):
+        """Test create with non-integer folder"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": "invalid", "uid": "123456789012345"}
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_folder_zero(self, mock_client):
+        """Test create with zero folder ID"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 0, "uid": "123456789012345"}
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_folder_negative(self, mock_client):
+        """Test create with negative folder ID"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": -1, "uid": "123456789012345"}
+
+        with pytest.raises(ValueError, match="ID must be a positive integer"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_state(self, mock_client):
+        """Test create with invalid state value"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "123456789012345", "state": 999}
+
+        with pytest.raises(ValueError, match="Invalid device state"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_category_id_type(self, mock_client):
+        """Test create with invalid category_id type"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "123456789012345", "category_id": "invalid"}
+
+        with pytest.raises(ValueError, match="Device 'category_id' must be an integer"):
+            devices_api.create(device_data)
+
+    def test_create_invalid_category_id_zero(self, mock_client):
+        """Test create with zero category_id"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "123456789012345", "category_id": 0}
+
+        with pytest.raises(
+            ValueError, match="Device 'category_id' must be a positive integer"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_category_id_negative(self, mock_client):
+        """Test create with negative category_id"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 1, "uid": "123456789012345", "category_id": -1}
+
+        with pytest.raises(
+            ValueError, match="Device 'category_id' must be a positive integer"
+        ):
+            devices_api.create(device_data)
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_valid_category_id(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test create with valid category_id"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 5, "uid": "123456789012345", "category_id": 10}
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_payload_cleaning(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test that unexpected fields are removed from payload"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 5,
+            "uid": "123456789012345",
+            "name": "Test Device",
+            "unexpected_field": "should be removed",
+            "another_invalid": 123,
+        }
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+        call_args = mock_request.call_args
+        sent_data = call_args[1]["json"]
+        assert "unexpected_field" not in sent_data
+        assert "another_invalid" not in sent_data
+        assert sent_data["folder"] == 5
+        assert sent_data["uid"] == "123456789012345"
+        assert sent_data["name"] == "Test Device"
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_comm_state_ignored(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test that comm_state is removed from payload (not allowed on create)"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        device_data = {"folder": 5, "uid": "123456789012345", "comm_state": 1}
+
+        result = devices_api.create(device_data)
+
+        assert isinstance(result, Device)
+        call_args = mock_request.call_args
+        sent_data = call_args[1]["json"]
+        assert "comm_state" not in sent_data
+
+    def test_create_invalid_imei_too_long(self, mock_client):
+        """Test create with imei too long"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 1,
+            "uid": "123456789012345",
+            "imei": "12345678901234567890",
+        }
+
+        with pytest.raises(
+            ValueError, match="Device 'imei' must not exceed 15 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_imei2_too_long(self, mock_client):
+        """Test create with imei2 too long"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 1,
+            "uid": "123456789012345",
+            "imei2": "12345678901234567890",
+        }
+
+        with pytest.raises(
+            ValueError, match="Device 'imei2' must not exceed 15 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_serial_number_too_long(self, mock_client):
+        """Test create with serial_number too long"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 1,
+            "uid": "123456789012345",
+            "serial_number": "1234567890123456789012345678901234567890",
+        }
+
+        with pytest.raises(
+            ValueError, match="Device 'serial_number' must not exceed 30 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_tpp_id_too_long(self, mock_client):
+        """Test create with tpp_id too long"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 1,
+            "uid": "123456789012345",
+            "tpp_id": "1234567890123456789012345678901234567890",
+        }
+
+        with pytest.raises(
+            ValueError, match="Device 'tpp_id' must not exceed 32 characters"
+        ):
+            devices_api.create(device_data)
+
+    def test_create_invalid_data_type(self, mock_client):
+        """Test create with non-dictionary data"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Device data must be a dictionary"):
+            devices_api.create("invalid")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_api_error_duplicate_uid(self, mock_request, mock_client):
+        """Test create when UID already exists"""
+        mock_request.side_effect = ValueError(
+            "Validation error: Device with this UID already exists"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Validation error"):
+            devices_api.create({"folder": 1, "uid": "123456789012345"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_api_error_folder_not_found(self, mock_request, mock_client):
+        """Test create when folder doesn't exist"""
+        mock_request.side_effect = ResourceNotFoundError("Requested resource not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Requested resource not found"):
+            devices_api.create({"folder": 999, "uid": "123456789012345"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_api_error_unauthorised(self, mock_request, mock_client):
+        """Test create when authentication fails"""
+        mock_request.side_effect = UnauthorisedError("Authorisation failed")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Authorisation failed"):
+            devices_api.create({"folder": 1, "uid": "123456789012345"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_api_error_permission_denied(self, mock_request, mock_client):
+        """Test create when user lacks permission"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(PermissionError, match="You are not authorised"):
+            devices_api.create({"folder": 1, "uid": "123456789012345"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_api_error_server_error(self, mock_request, mock_client):
+        """Test create with server error"""
+        mock_request.side_effect = ConnectAPIError(
+            "Connect API returned unexpected status code: 500"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="unexpected status code"):
+            devices_api.create({"folder": 1, "uid": "123456789012345"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_url_generation(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test URL generation for create endpoint"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = "https://api.example.com/api/v4/devices/device/"
+
+            devices_api.create({"folder": 1, "uid": "123456789012345"})
+
+            mock_url.assert_called_once_with("devices/device/")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
+    def test_create_data_structure(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test create sends correct data structure"""
+        devices_api = DevicesAPI(mock_client)
+        device_data = {
+            "folder": 5,
+            "uid": "123456789012345",
+            "name": "Test Device",
+            "description": "A test device",
+        }
+
+        mock_request.return_value = mock_created_device_response
+        devices_api.create(device_data)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs["json"] == device_data

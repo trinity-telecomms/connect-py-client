@@ -2,10 +2,12 @@ from typing import Dict, Any
 
 from trinity_connect_client.decorators import handle_exceptions
 from trinity_connect_client.mixins import ResourceMixin
+from trinity_connect_client.models.device import Device
 from trinity_connect_client.validators import (
     validate_id,
     validate_uid,
     validate_command,
+    validate_device_create_request,
 )
 
 
@@ -35,6 +37,44 @@ class DevicesAPI(ResourceMixin):
         validate_uid(device_uid)
         url = self._url(f"devices/uid/{device_uid}/")
         return self.make_get_request(url)
+
+    @handle_exceptions
+    def create(self, device_data: dict) -> Device:
+        """
+        Create a new device.
+
+        :param device_data: Dictionary containing device creation data
+            Required fields:
+                - folder (int): Folder ID where device will be created
+                - uid (str): Unique Device Identifier (15-20 characters, alphanumeric uppercase)
+
+            Optional fields:
+                - name (str): Device name
+                - description (str): Device description
+                - state (int): Device lifecycle state (default: 50)
+                - tpp_id (str): Third Party Platform ID
+                - imei (str): International Mobile Equipment Identifier
+                - imei2 (str): Secondary IMEI
+                - serial_number (str): Device serial number
+                - comm_interval_contract (int): Communication interval contract
+                - command_model (int): Command model ID
+                - data_lens (int): Data lens ID
+                - event_lens (int): Event lens ID
+                - profile (int): Profile ID
+                - category_id (int): Category ID
+
+        :return: Created device as Device instance
+        :raises ValueError: If validation fails (invalid fields, invalid values)
+        :raises ResourceNotFoundError: If folder not found (404)
+        :raises UnauthorisedError: If authentication fails (401)
+        :raises PermissionError: If permission denied (403) or lacks 'Can create devices' role
+        :raises ConnectAPIError: If API request fails
+        """
+        cleaned_data = validate_device_create_request(device_data)
+
+        url = self._url("devices/device/")
+        response = self.make_post_request(url, json=cleaned_data)
+        return Device.from_dict(response)
 
     @handle_exceptions
     def get_latest_data_by_uid(self, device_uid: str, **filters: str) -> dict[str, Any]:

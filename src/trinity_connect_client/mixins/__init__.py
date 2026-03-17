@@ -43,18 +43,65 @@ class ResourceMixin:
 
         try:
             response = requests.post(url, headers=request_headers, json=json)
-            return response.status_code, response.json()
         except Exception:
             raise ConnectAPIError("Failed to make request to Connect API")
+
+        if response.status_code == 401:
+            raise UnauthorisedError("Authorisation failed")
+        if response.status_code == 403:
+            raise PermissionError("You are not authorised to access this resource")
+        if response.status_code == 404:
+            raise ResourceNotFoundError("Requested resource not found")
+        if response.status_code == 400:
+            try:
+                error_data = response.json()
+                error_msg = (
+                    error_data.get("detail")
+                    or error_data.get("error")
+                    or str(error_data)
+                )
+            except Exception:
+                error_msg = response.text or "Bad request"
+            raise ValueError(f"Validation error: {error_msg}")
+        if response.status_code not in [200, 201]:
+            print(response.text)
+            raise ConnectAPIError(
+                f"Connect API returned unexpected status code: {response.status_code}"
+            )
+
+        return response.json()
 
     def make_patch_request(self, url, headers=None, json=None):
         request_headers = self._get_auth_headers() if not headers else headers
 
         try:
             response = requests.patch(url, headers=request_headers, json=json)
-            return response.status_code, response.json()
         except Exception:
             raise ConnectAPIError("Failed to make request to Connect API")
+
+        if response.status_code == 401:
+            raise UnauthorisedError("Authorisation failed")
+        if response.status_code == 403:
+            raise PermissionError("You are not authorised to access this resource")
+        if response.status_code == 404:
+            raise ResourceNotFoundError("Requested resource not found")
+        if response.status_code == 400:
+            try:
+                error_data = response.json()
+                error_msg = (
+                    error_data.get("detail")
+                    or error_data.get("error")
+                    or str(error_data)
+                )
+            except Exception:
+                error_msg = response.text or "Bad request"
+            raise ValueError(f"Validation error: {error_msg}")
+        if response.status_code != 200:
+            raise ConnectAPIError(
+                f"Connect API returned unexpected status code: {response.status_code}"
+            )
+
+        return response.json()
 
     def make_get_request(self, url, headers=None, params=None):
         request_headers = self._get_auth_headers() if not headers else headers
