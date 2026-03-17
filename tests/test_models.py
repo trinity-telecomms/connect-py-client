@@ -1,6 +1,13 @@
 """Tests for response models."""
 
-from trinity_connect_client.models import Company, Device, DeviceCommand, DeviceData, DeviceEvent, Folder
+from trinity_connect_client.models import (
+    Company,
+    Device,
+    DeviceCommand,
+    DeviceData,
+    DeviceEvent,
+    Folder,
+)
 
 
 class TestDevice:

@@ -53,3 +53,45 @@ def mock_device_response():
         "type": "sensor",
         "created_at": "2023-01-01T00:00:00Z",
     }
+
+
+@pytest.fixture
+def mock_created_device_response():
+    """Mock created device response with all required fields"""
+    return {
+        "id": 1,
+        "url": "https://api.example.com/api/v4/devices/1/",
+        "name": "",
+        "description": "",
+        "state": 50,
+        "t_type": 1,
+        "tpp_id": None,
+        "company": 1,
+        "folder": 5,
+        "state_display": "Created",
+        "t_type_display": "Device",
+        "company_name": "Test Company",
+        "folder_name": "Test Folder",
+        "company_url": "https://api.example.com/api/v4/orgs/company/1/",
+        "folder_url": "https://api.example.com/api/v4/orgs/folder/5/",
+        "aux_values_url": "https://api.example.com/api/v4/devices/1/aux_values/",
+        "uid": "123456789012345",
+        "imei": "",
+        "imei2": "",
+        "serial_number": "",
+        "comm_interval_contract": 3600,
+        "comm_state": 0,
+        "comm_state_display": "Unknown",
+        "youngest_comm_timestamp": "2023-01-01T00:00:00Z",
+        "command_model": 1,
+        "data_lens": 1,
+        "event_lens": None,
+        "profile": None,
+        "commands_url": "https://api.example.com/api/v4/devices/1/commands/",
+        "latest_data_url": "https://api.example.com/api/v4/devices/1/data/latest/",
+        "events_url": "https://api.example.com/api/v4/devices/1/events/",
+        "meta_url": "https://api.example.com/api/v4/devices/1/meta/",
+        "geo_url": "https://api.example.com/api/v4/devices/1/geo/",
+        "category_url": "https://api.example.com/api/v4/devices/1/category/",
+        "tags_url": "https://api.example.com/api/v4/devices/1/tags/",
+    }

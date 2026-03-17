@@ -206,9 +206,7 @@ class TestOrgsAPI:
         orgs_api = OrgsAPI(mock_client)
 
         with patch.object(orgs_api, "_url") as mock_url:
-            mock_url.return_value = (
-                "https://api.example.com/api/v4/orgs/company/1/"
-            )
+            mock_url.return_value = "https://api.example.com/api/v4/orgs/company/1/"
 
             orgs_api.get(1)
 
