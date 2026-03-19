@@ -211,6 +211,92 @@ response = client.devices.issue_stored_command_by_uid(
 
 Stored commands are pre-configured automation scripts in Connect, referenced by their numeric code (e.g., 240, 248) rather than direct device-level RPCs.
 
+## Device Management
+
+The library provides comprehensive device management operations:
+
+### Device Retrieval
+
+```python
+# Get device by ID (returns dict)
+device = client.devices.get(device_id=123)
+
+# Get device by UID
+device = client.devices.get_by_uid(device_uid="DEVICE123456789")
+
+# Get latest data by UID
+data = client.devices.get_latest_data_by_uid("DEVICE123456789")
+
+# Get events by UID
+events = client.devices.get_events_by_uid("DEVICE123456789")
+
+# Get commands by UID
+commands = client.devices.get_commands_by_uid("DEVICE123456789")
+
+# List devices by folder
+devices = client.devices.list_by_folder(folder_id=5)
+```
+
+### Device Creation
+
+```python
+# Create a new device
+from trinity_connect_client import Device
+
+device_data = {
+    "folder": 5,
+    "uid": "DEVICE123456789",  # 15-20 alphanumeric uppercase characters
+    "name": "My Device",
+    "description": "Device description"
+}
+device = client.devices.create(device_data)
+# Returns Device model instance
+print(f"Created device: {device.name}")
+```
+
+### Device Update (Partial)
+
+Use `update_by_uid` for partial updates - only specified fields change:
+
+```python
+# Partial update - omitted fields remain unchanged
+device = client.devices.update_by_uid("DEVICE123456789", {
+    "name": "Updated Name",
+    "description": "New description",
+    "folder": 10  # Move to different folder
+})
+```
+
+### Device Overwrite (Full Replacement)
+
+Use `overwrite_by_uid` for full replacement - all fields must be specified:
+
+```python
+# Full replacement - requires folder and uid
+device = client.devices.overwrite_by_uid("DEVICE123456789", {
+    "folder": 5,
+    "uid": "DEVICE123456789",  # Required
+    "name": "Overwritten Device",
+    "description": "Complete replacement",
+    "serial_number": "SN12345"
+})
+```
+
+**Note:** `update_by_uid` (PATCH) vs `overwrite_by_uid` (PUT):
+- `update_by_uid`: Partial update, omitted fields remain unchanged
+- `overwrite_by_uid`: Full replacement, all required fields must be provided
+
+### Device Deletion
+
+Permanently delete a device:
+
+```python
+# Delete device by UID (returns None)
+client.devices.delete_by_uid("DEVICE123456789")
+```
+
+**Warning:** Deletion is permanent and irreversible. Consider using lifecycle states for non-destructive deactivation.
+
 ## Error Handling
 
 The library raises specific exceptions for different error conditions:
