@@ -92,9 +92,68 @@ Stored commands are pre-configured automation scripts in Connect, referenced by 
 
 ---
 
-### Additional Resources
+## Device Management
 
-- [Error Handling](#error-handling)
+The library provides methods for device management operations:
+
+### Get Device
+
+```python
+# Get device by ID
+device = client.devices.get(device_id=123)
+
+# Get device by UID
+device = client.devices.get_by_uid(device_uid="DEVICE123456789")
+```
+
+### Create Device
+
+```python
+# Create a new device
+device = client.devices.create({
+    "folder": 5,
+    "uid": "DEVICE123456789",
+    "name": "My Device",
+    "description": "Device description"
+})
+```
+
+### Update Device (Partial)
+
+Update specific fields without affecting others:
+
+```python
+# Partial update - only specified fields change
+device = client.devices.update_by_uid("DEVICE123456789", {
+    "name": "Updated Name",
+    "description": "New description"
+})
+```
+
+### Overwrite Device (Full)
+
+Replace all device fields - requires required fields:
+
+```python
+# Full replacement - requires folder and uid
+device = client.devices.overwrite_by_uid("DEVICE123456789", {
+    "folder": 5,
+    "uid": "DEVICE123456789",
+    "name": "Overwritten Device",
+    "description": "Complete replacement"
+})
+```
+
+### Delete Device
+
+Permanently remove a device:
+
+```python
+# Delete device by UID (returns None)
+client.devices.delete_by_uid("DEVICE123456789")
+```
+
+---
 
 ## Error Handling
 
@@ -150,7 +209,7 @@ client = ConnectClient(
 
 ## Version Information
 
-Current version: **0.3.0**
+Current version: **0.3.3**
 
 For more information, visit
 the [GitHub repository](https://github.com/trinity-telecomms/connect-py-client).

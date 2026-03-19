@@ -271,3 +271,102 @@ class DevicesAPI(ResourceMixin):
         url = self._url(f"devices/uid/{device_uid}/command/send/stored/")
         data = {"command": command_code}
         return self.make_post_request(url, json=data)
+
+    @handle_exceptions
+    def update_by_uid(self, device_uid: str, device_data: dict) -> Device:
+        """
+        Update (PATCH) specific fields of a device by UID.
+
+        This performs a partial update - only the fields provided will be updated,
+        all other fields remain unchanged.
+
+        :param device_uid: The UID of the device to update
+        :param device_data: Dictionary containing fields to update
+            Updatable fields (all optional):
+                - name (str): Device name
+                - description (str): Device description
+                - state (int): Device lifecycle state
+                - tpp_id (str): Third Party Platform ID
+                - folder (int): Folder ID to move device to
+                - imei (str): International Mobile Equipment Identifier
+                - imei2 (str): Secondary IMEI
+                - serial_number (str): Device serial number
+                - comm_interval_contract (int): Communication interval contract
+                - command_model (int): Command model ID
+                - data_lens (int): Data lens ID
+                - event_lens (int): Event lens ID
+                - profile (int): Profile ID
+        :return: Updated device as Device instance
+        :raises ValueError: If device_uid is not a valid string
+        :raises ResourceNotFoundError: If device not found (404)
+        :raises UnauthorisedError: If authentication fails (401)
+        :raises PermissionError: If permission denied (403)
+        :raises ConnectAPIError: If API request fails
+        """
+        validate_uid(device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
+        response = self.make_patch_request(url, json=device_data)
+        return Device.from_dict(response)
+
+    @handle_exceptions
+    def overwrite_by_uid(self, device_uid: str, device_data: dict) -> Device:
+        """
+        Overwrite (PUT) all fields of a device by UID.
+
+        This performs a full replacement - all required fields must be provided.
+        Fields not included in the request will be set to their default values.
+
+        Required fields:
+            - folder (int): Folder ID where device resides
+            - uid (str): Unique Device Identifier
+
+        Optional fields (will use defaults if not provided):
+            - name (str): Device name
+            - description (str): Device description
+            - state (int): Device lifecycle state (default: 50)
+            - tpp_id (str): Third Party Platform ID
+            - imei (str): International Mobile Equipment Identifier
+            - imei2 (str): Secondary IMEI
+            - serial_number (str): Device serial number
+            - comm_interval_contract (int): Communication interval contract
+            - command_model (int): Command model ID
+            - data_lens (int): Data lens ID
+            - event_lens (int): Event lens ID
+            - profile (int): Profile ID
+
+        :param device_uid: The UID of the device to overwrite
+        :param device_data: Dictionary containing ALL device fields
+        :return: Overwritten device as Device instance
+        :raises ValueError: If device_uid is not a valid string or validation fails
+        :raises ResourceNotFoundError: If device not found (404)
+        :raises UnauthorisedError: If authentication fails (401)
+        :raises PermissionError: If permission denied (403)
+        :raises ConnectAPIError: If API request fails
+        """
+        validate_uid(device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
+        response = self.make_put_request(url, json=device_data)
+        return Device.from_dict(response)
+
+    @handle_exceptions
+    def delete_by_uid(self, device_uid: str) -> None:
+        """
+        Delete a device by UID.
+
+        This is a destructive operation that permanently removes the device
+        and all associated data. This action is irreversible.
+
+        Consider marking the device as 'Deactivated' or 'Pending Deletion'
+        instead for a non-destructive alternative.
+
+        :param device_uid: The UID of the device to delete
+        :return: None
+        :raises ValueError: If device_uid is not a valid string
+        :raises ResourceNotFoundError: If device not found (404)
+        :raises UnauthorisedError: If authentication fails (401)
+        :raises PermissionError: If permission denied (403)
+        :raises ConnectAPIError: If API request fails
+        """
+        validate_uid(device_uid)
+        url = self._url(f"devices/uid/{device_uid}/")
+        self.make_delete_request(url)

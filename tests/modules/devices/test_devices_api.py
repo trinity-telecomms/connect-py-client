@@ -1392,3 +1392,395 @@ class TestDevicesAPI:
 
         _, kwargs = mock_request.call_args
         assert kwargs["json"] == device_data
+
+    # ==================== Device Update_by_uid Tests ====================
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_success(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test successful device update by UID (PATCH)"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        update_data = {"name": "Updated Device", "description": "Updated description"}
+
+        result = devices_api.update_by_uid("TEST123456789ABC", update_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_with_folder(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test update_by_uid with folder change"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        update_data = {"folder": 10}
+
+        result = devices_api.update_by_uid("TEST123456789ABC", update_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_with_state(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test update_by_uid with state change"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        update_data = {"state": 51}
+
+        result = devices_api.update_by_uid("TEST123456789ABC", update_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_multiple_fields(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test update_by_uid with multiple fields"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        update_data = {
+            "name": "Updated Name",
+            "description": "Updated description",
+            "serial_number": "SN98765",
+            "folder": 10,
+        }
+
+        result = devices_api.update_by_uid("TEST123456789ABC", update_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    def test_update_by_uid_invalid_uid_type(self, mock_client):
+        """Test update_by_uid with invalid UID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.update_by_uid(123, {"name": "test"})
+
+    def test_update_by_uid_empty_uid(self, mock_client):
+        """Test update_by_uid with empty UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.update_by_uid("", {"name": "test"})
+
+    def test_update_by_uid_whitespace_uid(self, mock_client):
+        """Test update_by_uid with whitespace-only UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.update_by_uid("   ", {"name": "test"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_not_found(self, mock_request, mock_client):
+        """Test update_by_uid when device not found"""
+        mock_request.side_effect = ResourceNotFoundError("Device not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Device not found"):
+            devices_api.update_by_uid("NONEXISTENT12345", {"name": "test"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_unauthorised(self, mock_request, mock_client):
+        """Test update_by_uid when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Authorisation failed")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Authorisation failed"):
+            devices_api.update_by_uid("TEST123456789ABC", {"name": "test"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_forbidden(self, mock_request, mock_client):
+        """Test update_by_uid when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(PermissionError, match="You are not authorised"):
+            devices_api.update_by_uid("TEST123456789ABC", {"name": "test"})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_validation_error(self, mock_request, mock_client):
+        """Test update_by_uid with validation error from API"""
+        mock_request.side_effect = ValueError("Validation error: Invalid state value")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Validation error"):
+            devices_api.update_by_uid("TEST123456789ABC", {"state": 999})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_url_generation(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test URL generation for update_by_uid endpoint"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
+                "https://api.example.com/api/v4/devices/uid/TEST123456789ABC/"
+            )
+
+            devices_api.update_by_uid("TEST123456789ABC", {"name": "test"})
+
+            mock_url.assert_called_once_with("devices/uid/TEST123456789ABC/")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_patch_request")
+    def test_update_by_uid_data_structure(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test update_by_uid sends correct data structure"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        update_data = {"name": "Updated", "description": "New description"}
+
+        devices_api.update_by_uid("TEST123456789ABC", update_data)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs["json"] == update_data
+
+    # ==================== Device Overwrite_by_uid Tests ====================
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_success(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test successful device overwrite by UID (PUT)"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        overwrite_data = {
+            "folder": 5,
+            "uid": "TEST123456789ABC",
+            "name": "Overwritten Device",
+        }
+
+        result = devices_api.overwrite_by_uid("TEST123456789ABC", overwrite_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_minimal_required_fields(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test overwrite_by_uid with minimal required fields"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        overwrite_data = {"folder": 5, "uid": "TEST123456789ABC"}
+
+        result = devices_api.overwrite_by_uid("TEST123456789ABC", overwrite_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_all_fields(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test overwrite_by_uid with all fields"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        overwrite_data = {
+            "folder": 5,
+            "uid": "TEST123456789ABC",
+            "name": "Full Overwrite",
+            "description": "Complete device data",
+            "state": 50,
+            "imei": "123456789012345",
+            "serial_number": "SN12345",
+        }
+
+        result = devices_api.overwrite_by_uid("TEST123456789ABC", overwrite_data)
+
+        assert isinstance(result, Device)
+        mock_request.assert_called_once()
+
+    def test_overwrite_by_uid_invalid_uid_type(self, mock_client):
+        """Test overwrite_by_uid with invalid UID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.overwrite_by_uid(123, {"folder": 1})
+
+    def test_overwrite_by_uid_empty_uid(self, mock_client):
+        """Test overwrite_by_uid with empty UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.overwrite_by_uid("", {"folder": 1})
+
+    def test_overwrite_by_uid_whitespace_uid(self, mock_client):
+        """Test overwrite_by_uid with whitespace-only UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.overwrite_by_uid("   ", {"folder": 1})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_not_found(self, mock_request, mock_client):
+        """Test overwrite_by_uid when device not found"""
+        mock_request.side_effect = ResourceNotFoundError("Device not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Device not found"):
+            devices_api.overwrite_by_uid(
+                "NONEXISTENT12345", {"folder": 1, "uid": "NONEXISTENT12345"}
+            )
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_unauthorised(self, mock_request, mock_client):
+        """Test overwrite_by_uid when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Authorisation failed")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Authorisation failed"):
+            devices_api.overwrite_by_uid("TEST123456789ABC", {"folder": 1})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_forbidden(self, mock_request, mock_client):
+        """Test overwrite_by_uid when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(PermissionError, match="You are not authorised"):
+            devices_api.overwrite_by_uid("TEST123456789ABC", {"folder": 1})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_validation_error(self, mock_request, mock_client):
+        """Test overwrite_by_uid with validation error from API"""
+        mock_request.side_effect = ValueError("Validation error: folder is required")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="Validation error"):
+            devices_api.overwrite_by_uid("TEST123456789ABC", {})
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_url_generation(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test URL generation for overwrite_by_uid endpoint"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
+                "https://api.example.com/api/v4/devices/uid/TEST123456789ABC/"
+            )
+
+            devices_api.overwrite_by_uid(
+                "TEST123456789ABC", {"folder": 5, "uid": "TEST123456789ABC"}
+            )
+
+            mock_url.assert_called_once_with("devices/uid/TEST123456789ABC/")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_put_request")
+    def test_overwrite_by_uid_data_structure(
+        self, mock_request, mock_client, mock_created_device_response
+    ):
+        """Test overwrite_by_uid sends correct data structure"""
+        mock_request.return_value = mock_created_device_response
+        devices_api = DevicesAPI(mock_client)
+        overwrite_data = {"folder": 5, "uid": "TEST123456789ABC", "name": "Overwritten"}
+
+        devices_api.overwrite_by_uid("TEST123456789ABC", overwrite_data)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs["json"] == overwrite_data
+
+    # ==================== Device Delete_by_uid Tests ====================
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_success(self, mock_request, mock_client):
+        """Test successful device deletion by UID"""
+        mock_request.return_value = None
+        devices_api = DevicesAPI(mock_client)
+
+        result = devices_api.delete_by_uid("TEST123456789ABC")
+
+        assert result is None
+        mock_request.assert_called_once()
+
+    def test_delete_by_uid_invalid_uid_type(self, mock_client):
+        """Test delete_by_uid with invalid UID type"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.delete_by_uid(123)
+
+    def test_delete_by_uid_empty_uid(self, mock_client):
+        """Test delete_by_uid with empty UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.delete_by_uid("")
+
+    def test_delete_by_uid_whitespace_uid(self, mock_client):
+        """Test delete_by_uid with whitespace-only UID"""
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ValueError, match="UID must be a non-empty string"):
+            devices_api.delete_by_uid("   ")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_not_found(self, mock_request, mock_client):
+        """Test delete_by_uid when device not found"""
+        mock_request.side_effect = ResourceNotFoundError("Device not found")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ResourceNotFoundError, match="Device not found"):
+            devices_api.delete_by_uid("NONEXISTENT12345")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_unauthorised(self, mock_request, mock_client):
+        """Test delete_by_uid when access unauthorised"""
+        mock_request.side_effect = UnauthorisedError("Authorisation failed")
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(UnauthorisedError, match="Authorisation failed"):
+            devices_api.delete_by_uid("TEST123456789ABC")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_forbidden(self, mock_request, mock_client):
+        """Test delete_by_uid when access forbidden"""
+        mock_request.side_effect = PermissionError(
+            "You are not authorised to access this resource"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(PermissionError, match="You are not authorised"):
+            devices_api.delete_by_uid("TEST123456789ABC")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_url_generation(self, mock_request, mock_client):
+        """Test URL generation for delete_by_uid endpoint"""
+        mock_request.return_value = None
+        devices_api = DevicesAPI(mock_client)
+
+        with patch.object(devices_api, "_url") as mock_url:
+            mock_url.return_value = (
+                "https://api.example.com/api/v4/devices/uid/TEST123456789ABC/"
+            )
+
+            devices_api.delete_by_uid("TEST123456789ABC")
+
+            mock_url.assert_called_once_with("devices/uid/TEST123456789ABC/")
+
+    @patch("trinity_connect_client.mixins.ResourceMixin.make_delete_request")
+    def test_delete_by_uid_server_error(self, mock_request, mock_client):
+        """Test delete_by_uid with server error"""
+        mock_request.side_effect = ConnectAPIError(
+            "Connect API returned unexpected status code: 500"
+        )
+        devices_api = DevicesAPI(mock_client)
+
+        with pytest.raises(ConnectAPIError, match="unexpected status code"):
+            devices_api.delete_by_uid("TEST123456789ABC")
