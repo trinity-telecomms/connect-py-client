@@ -61,7 +61,7 @@ class DevicesAPI(ResourceMixin):
                 - data_lens (int): Data lens ID
                 - event_lens (int): Event lens ID
                 - profile (int): Profile ID
-                - category_id (int): Category ID
+                - category (int): Category ID
 
         :return: Created device as Device instance
         :raises ValueError: If validation fails (invalid fields, invalid values)

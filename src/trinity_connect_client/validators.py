@@ -52,7 +52,7 @@ def validate_device_create_request(data):
         "data_lens",
         "event_lens",
         "profile",
-        "category_id",
+        "category",
     }
 
     cleaned_data = {k: v for k, v in data.items() if k in ALLOWED_FIELDS}
@@ -102,10 +102,10 @@ def validate_device_create_request(data):
         if len(str(cleaned_data["tpp_id"])) > 32:
             raise ValueError("Device 'tpp_id' must not exceed 32 characters")
 
-    if "category_id" in cleaned_data and cleaned_data.get("category_id") is not None:
-        if not isinstance(cleaned_data["category_id"], int):
-            raise ValueError("Device 'category_id' must be an integer")
-        if cleaned_data["category_id"] <= 0:
-            raise ValueError("Device 'category_id' must be a positive integer")
+    if "category" in cleaned_data and cleaned_data.get("category") is not None:
+        if not isinstance(cleaned_data["category"], int):
+            raise ValueError("Device 'category' must be an integer")
+        if cleaned_data["category"] <= 0:
+            raise ValueError("Device 'category' must be a positive integer")
 
     return cleaned_data

@@ -27,7 +27,7 @@ Using `uv`:
 uv add git+https://github.com/trinity-telecomms/connect-py-client
 
 # Install specific version
-uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.2.1
+uv add git+https://github.com/trinity-telecomms/connect-py-client@v0.3.4
 ```
 
 Using `pip`:
@@ -37,7 +37,7 @@ Using `pip`:
 pip install git+https://github.com/trinity-telecomms/connect-py-client
 
 # Install specific version
-pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.2.1
+pip install git+https://github.com/trinity-telecomms/connect-py-client@v0.3.4
 ```
 
 ## Quick Start
@@ -209,7 +209,7 @@ client = ConnectClient(
 
 ## Version Information
 
-Current version: **0.3.3**
+Current version: **0.3.4**
 
 For more information, visit
 the [GitHub repository](https://github.com/trinity-telecomms/connect-py-client).

@@ -1160,42 +1160,42 @@ class TestDevicesAPI:
         with pytest.raises(ValueError, match="Invalid device state"):
             devices_api.create(device_data)
 
-    def test_create_invalid_category_id_type(self, mock_client):
-        """Test create with invalid category_id type"""
+    def test_create_invalid_category_type(self, mock_client):
+        """Test create with invalid category type"""
         devices_api = DevicesAPI(mock_client)
-        device_data = {"folder": 1, "uid": "123456789012345", "category_id": "invalid"}
+        device_data = {"folder": 1, "uid": "123456789012345", "category": "invalid"}
 
-        with pytest.raises(ValueError, match="Device 'category_id' must be an integer"):
+        with pytest.raises(ValueError, match="Device 'category' must be an integer"):
             devices_api.create(device_data)
 
-    def test_create_invalid_category_id_zero(self, mock_client):
-        """Test create with zero category_id"""
+    def test_create_invalid_category_zero(self, mock_client):
+        """Test create with zero category"""
         devices_api = DevicesAPI(mock_client)
-        device_data = {"folder": 1, "uid": "123456789012345", "category_id": 0}
+        device_data = {"folder": 1, "uid": "123456789012345", "category": 0}
 
         with pytest.raises(
-            ValueError, match="Device 'category_id' must be a positive integer"
+            ValueError, match="Device 'category' must be a positive integer"
         ):
             devices_api.create(device_data)
 
-    def test_create_invalid_category_id_negative(self, mock_client):
-        """Test create with negative category_id"""
+    def test_create_invalid_category_negative(self, mock_client):
+        """Test create with negative category"""
         devices_api = DevicesAPI(mock_client)
-        device_data = {"folder": 1, "uid": "123456789012345", "category_id": -1}
+        device_data = {"folder": 1, "uid": "123456789012345", "category": -1}
 
         with pytest.raises(
-            ValueError, match="Device 'category_id' must be a positive integer"
+            ValueError, match="Device 'category' must be a positive integer"
         ):
             devices_api.create(device_data)
 
     @patch("trinity_connect_client.mixins.ResourceMixin.make_post_request")
-    def test_create_valid_category_id(
+    def test_create_valid_category(
         self, mock_request, mock_client, mock_created_device_response
     ):
-        """Test create with valid category_id"""
+        """Test create with valid category"""
         mock_request.return_value = mock_created_device_response
         devices_api = DevicesAPI(mock_client)
-        device_data = {"folder": 5, "uid": "123456789012345", "category_id": 10}
+        device_data = {"folder": 5, "uid": "123456789012345", "category": 10}
 
         result = devices_api.create(device_data)
 
